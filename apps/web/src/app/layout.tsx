@@ -7,6 +7,8 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import type React from "react";
 import { Suspense } from "react";
+import { TRPCReactProvider } from "@/trpc/react";
+// @ts-ignore
 import "@workspace/ui/globals.css";
 
 export const metadata: Metadata = {
@@ -65,12 +67,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense fallback={<div>Loading...</div>}>
-            <Navigation />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-            <Analytics />
-          </Suspense>
+          <TRPCReactProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Navigation />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+              <Analytics />
+            </Suspense>
+          </TRPCReactProvider>
         </ThemeProvider>
       </body>
     </html>

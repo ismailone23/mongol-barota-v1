@@ -12,14 +12,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.8",
+    "@trpc/client": "^11.7.1",
+    "@trpc/server": "^11.7.1",
+    "@trpc/tanstack-react-query": "^11.7.1",
     "@vercel/analytics": "^1.5.0",
+    "@workspace/api": "workspace:*",
     "@workspace/ui": "workspace:*",
     "geist": "^1.5.1",
     "lucide-react": "^0.475.0",
     "next": "^15.4.5",
     "next-themes": "^0.4.6",
+    "pg": "^8.16.3",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "superjson": "^2.2.5"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",

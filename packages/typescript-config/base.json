@@ -9,6 +9,9 @@
     "isolatedModules": true,
     "lib": [
       "es2022",
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
     "module": "Preserve",
     "moduleResolution": "Bundler",
@@ -18,12 +21,12 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
-    "exclude": [
-      "node_modules",
-      "build",
-      "dist",
-      ".next",
-      ".expo"
-    ]
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    ".next",
+    ".expo"
+  ]
 }

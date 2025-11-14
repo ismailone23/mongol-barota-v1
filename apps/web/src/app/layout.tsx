@@ -10,46 +10,9 @@ import { Suspense } from "react";
 import { TRPCReactProvider } from "@/trpc/react";
 // @ts-ignore
 import "@workspace/ui/globals.css";
+import { constructMetadata } from "@/lib/construct-metadata";
 
-export const metadata: Metadata = {
-  title: "MIST Mongol Barota",
-  description:
-    "MIST Mongol Barota is Bangladesh's premier Mars rover team, competing in University Rover Challenge and Anatolian Rover Challenge. URC 2021 Global Champions.",
-  keywords: [
-    "Mars rover",
-    "robotics",
-    "MIST",
-    "Mongol Barota",
-    "Mars Exploration",
-    "NASA",
-    "URC",
-    "Anatolian Rover Challenge",
-    "ARC",
-    "University Rover Challenge",
-    "Bangladesh",
-    "space exploration",
-    "engineering",
-  ],
-  authors: [{ name: "MIST Mongol Barota Team" }],
-  creator: "MIST Mongol Barota",
-  publisher: "Military Institute of Science and Technology",
-  icons: {
-    icon: "/logo_black.svg",
-  },
-  openGraph: {
-    title: "MIST Mongol Barota",
-    description:
-      "Bangladesh's premier Mars rover team. URC 2021 Global Champions.",
-    type: "website",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MIST Mongol Barota",
-    description:
-      "Bangladesh's premier Mars rover team. URC 2021 Global Champions.",
-  },
-};
+export const metadata: Metadata = constructMetadata();
 
 export default function RootLayout({
   children,

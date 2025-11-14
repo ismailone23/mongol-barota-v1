@@ -24,9 +24,10 @@ import { ZodError } from "zod";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async () => {
+export const createTRPCContext = async (opts?: { headers?: Headers }) => {
   return {
     db,
+    headers: opts?.headers,
   };
 };
 

@@ -169,7 +169,7 @@ export function HeroSection() {
                 : "opacity-0 translate-x-8 scale-95"
             }`}
           >
-            <div className="relative aspect-square max-w-lg">
+            <div className=" aspect-square max-w-lg">
               {/* Rover Image Placeholder */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl animate-pulse-slow" />
               <Image
@@ -182,7 +182,7 @@ export function HeroSection() {
 
               {/* Floating Elements */}
               <div
-                className={`absolute -top-4 -right-4 bg-card border rounded-lg p-3 shadow-lg animate-float transition-all duration-1000 delay-1500 hover:scale-110 cursor-pointer ${
+                className={`absolute -top-4 -right-4 md:-right-6 bg-card border rounded-lg p-3 shadow-lg animate-float transition-all duration-1000 delay-1500 hover:scale-110 cursor-pointer ${
                   isVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 -translate-y-4"
@@ -195,7 +195,7 @@ export function HeroSection() {
               </div>
 
               <div
-                className={`absolute -bottom-4 -left-4 bg-card border rounded-lg p-3 shadow-lg animate-float transition-all duration-1000 delay-1700 hover:scale-110 cursor-pointer ${
+                className={`absolute -bottom-4 md:-left-6 -left-4 bg-card border rounded-lg p-3 shadow-lg animate-float transition-all duration-1000 delay-1700 hover:scale-110 cursor-pointer ${
                   isVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-4"

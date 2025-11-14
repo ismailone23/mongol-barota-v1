@@ -5,12 +5,14 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./trpc": "./src/trpc.ts"
+    "./trpc": "./src/trpc.ts",
+    "./schema": "./src/schema/auth.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20.19.9",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
@@ -21,6 +23,8 @@
     "@trpc/next": "^11.7.1",
     "@trpc/server": "^11.7.1",
     "@workspace/db": "workspace:*",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.44.7",
     "next": "^15.4.5",
     "pg": "^8.16.3",

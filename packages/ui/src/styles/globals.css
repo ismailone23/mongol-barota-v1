@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+@source "../../../apps/pannel/**/*.{ts,tsx}";
 @source "../../../apps/web/**/*.{ts,tsx}";
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";

@@ -1,11 +1,11 @@
 {
-  "id": "af54b51c-b769-4abb-bf51-bd7c1b2f2ee2",
+  "id": "76de7f32-1750-407a-bebd-81db61b7e7c5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.competition_region": {
-      "name": "competition_region",
+    "public.participated_competition": {
+      "name": "participated_competition",
       "schema": "",
       "columns": {
         "id": {
@@ -18,77 +18,6 @@
         "competition_region_name": {
           "name": "competition_region_name",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "competition_desciption": {
-          "name": "competition_desciption",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "competition_location": {
-          "name": "competition_location",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "competition_organizer": {
-          "name": "competition_organizer",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "organizer_website": {
-          "name": "organizer_website",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "competition_region_id_unique": {
-          "name": "competition_region_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.participated_competition": {
-      "name": "participated_competition",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "competition_region_id": {
-          "name": "competition_region_id",
-          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -176,19 +105,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "participated_competition_competition_region_id_competition_region_id_fk": {
-          "name": "participated_competition_competition_region_id_competition_region_id_fk",
-          "tableFrom": "participated_competition",
-          "tableTo": "competition_region",
-          "columnsFrom": [
-            "competition_region_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
         "participated_competition_rover_id_rover_id_fk": {
           "name": "participated_competition_rover_id_rover_id_fk",
           "tableFrom": "participated_competition",

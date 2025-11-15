@@ -7,6 +7,7 @@ import {
   users,
   verificationTokens,
 } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
 
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 
@@ -38,6 +39,19 @@ export const authConfig: NextAuthConfig = {
     strategy: "jwt",
   },
   callbacks: {
+    async signIn({ user }) {
+      if (user.email) {
+        const [existingUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, user.email));
+        if (!existingUser?.emailVerified) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    },
     session: ({ session, token }) => ({
       ...session,
       user: {

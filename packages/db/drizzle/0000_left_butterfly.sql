@@ -1,18 +1,6 @@
-CREATE TABLE "competition_region" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"competition_region_name" text NOT NULL,
-	"competition_desciption" text NOT NULL,
-	"competition_location" text NOT NULL,
-	"competition_organizer" varchar NOT NULL,
-	"organizer_website" text NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"image" text NOT NULL,
-	CONSTRAINT "competition_region_id_unique" UNIQUE("id")
-);
---> statement-breakpoint
 CREATE TABLE "participated_competition" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"competition_region_id" uuid NOT NULL,
+	"competition_region_name" text NOT NULL,
 	"competition_name" text NOT NULL,
 	"competition_description" text NOT NULL,
 	"competition_location" text NOT NULL,
@@ -154,7 +142,6 @@ CREATE TABLE "verificationToken" (
 	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "participated_competition" ADD CONSTRAINT "participated_competition_competition_region_id_competition_region_id_fk" FOREIGN KEY ("competition_region_id") REFERENCES "public"."competition_region"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "participated_competition" ADD CONSTRAINT "participated_competition_rover_id_rover_id_fk" FOREIGN KEY ("rover_id") REFERENCES "public"."rover"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sponsor" ADD CONSTRAINT "sponsor_sponsorship_plan_sponsorship_plans_id_fk" FOREIGN KEY ("sponsorship_plan") REFERENCES "public"."sponsorship_plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sponsor" ADD CONSTRAINT "sponsor_competition_id_participated_competition_id_fk" FOREIGN KEY ("competition_id") REFERENCES "public"."participated_competition"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

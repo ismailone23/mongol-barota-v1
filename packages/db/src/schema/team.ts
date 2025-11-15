@@ -23,11 +23,12 @@ export const teamMembers = pgTable("team_members", (t) => ({
     .timestamp("created_at", { withTimezone: true, mode: "date" })
     .defaultNow()
     .notNull(),
-  from: t.timestamp("from", { mode: "date" }).defaultNow().notNull(),
+  from: t.timestamp("from", { mode: "date" }).notNull(),
   until: t.timestamp("until", { mode: "date" }),
 }));
 
-export type TeamMembers = typeof teamMembers.$inferSelect;
+export type TeamMembersInsert = typeof teamMembers.$inferInsert;
+export type TeamMembersSelect = typeof teamMembers.$inferSelect;
 
 // ============= JUNCTION TABLE: Team Members <-> Competitions =============
 // This is needed for many-to-many relationship

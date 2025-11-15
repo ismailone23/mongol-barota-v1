@@ -1,9 +1,10 @@
 import { RegisterSchema } from "../schema/auth";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { users } from "@workspace/db/schema";
-import { eq, or } from "drizzle-orm";
+import { asc, eq, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import * as z from "zod";
 
 export const authRoute = createTRPCRouter({
   registerUser: publicProcedure
@@ -41,4 +42,60 @@ export const authRoute = createTRPCRouter({
         message: "User Created Successfully. Check email for verification.",
       };
     }),
+  verifyUser: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const loggedInUser = ctx.session.user;
+      if (loggedInUser.email) {
+        const [currentUser] = await ctx.db
+          .select()
+          .from(users)
+          .where(eq(users.email, loggedInUser.email));
+        if (currentUser?.emailVerified) {
+          const [toUpdate] = await ctx.db
+            .update(users)
+            .set({ emailVerified: new Date() })
+            .where(eq(users.id, input.id))
+            .returning();
+          if (toUpdate) {
+            return { toUpdate, message: "User verified" };
+          }
+        }
+      }
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You don't have rights to do this action",
+      });
+    }),
+  deleteUser: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const loggedInUser = ctx.session.user;
+      if (loggedInUser.email) {
+        const [currentUser] = await ctx.db
+          .select()
+          .from(users)
+          .where(eq(users.email, loggedInUser.email));
+        if (currentUser?.id === input.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You cann't delete your account by yourself",
+          });
+        }
+        const [deleteUser] = await ctx.db
+          .delete(users)
+          .where(eq(users.id, input.id))
+          .returning();
+        if (deleteUser) {
+          return { deleteUser, message: "User deleted" };
+        }
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong",
+      });
+    }),
+  allUsers: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.select().from(users).orderBy(asc(users.emailVerified));
+  }),
 });

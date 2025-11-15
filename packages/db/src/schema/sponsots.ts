@@ -19,7 +19,7 @@ export const sponsorshipPlans = pgTable("sponsorship_plans", (t) => ({
     .array()
     .notNull()
     .default(sql`ARRAY[]::text[]`),
-  isActive: t.boolean("is_active").default(true).notNull(),
+  isActive: t.boolean("is_active").default(false).notNull(),
   createdAt: t.timestamp("created_at").defaultNow().notNull(),
   updatedAt: t.timestamp("updated_at").defaultNow().notNull(),
 }));
@@ -40,10 +40,10 @@ export const sponsors = pgTable("sponsor", (t) => ({
   sponsorshipPlan: t
     .uuid("sponsorship_plan")
     .notNull()
-    .references(() => sponsorshipPlans.id, { onDelete: "cascade" }),
+    .references(() => sponsorshipPlans.id, { onDelete: "no action" }),
   competitionId: t
     .uuid("competition_id")
-    .references(() => participatedCompetitions.id, { onDelete: "cascade" }),
+    .references(() => participatedCompetitions.id, { onDelete: "no action" }),
   createdAt: t
     .timestamp("created_at", { mode: "date", withTimezone: true })
     .defaultNow()

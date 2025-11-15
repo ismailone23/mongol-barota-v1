@@ -5,6 +5,7 @@ import "@workspace/ui/globals.css";
 import { TRPCReactProvider } from "@/trpc/react";
 import { SessionProvider } from "next-auth/react";
 import { Suspense } from "react";
+import { Toaster } from "@workspace/ui/components/sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,7 +32,10 @@ export default function RootLayout({
       >
         <Suspense fallback={<p>loading....</p>}>
           <SessionProvider>
-            <TRPCReactProvider>{children}</TRPCReactProvider>
+            <TRPCReactProvider>
+              {children}
+              <Toaster />
+            </TRPCReactProvider>
           </SessionProvider>
         </Suspense>
       </body>

@@ -22,6 +22,7 @@
   "dependencies": {
     "@trpc/next": "^11.7.1",
     "@trpc/server": "^11.7.1",
+    "@workspace/auth": "workspace:*",
     "@workspace/db": "workspace:*",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",

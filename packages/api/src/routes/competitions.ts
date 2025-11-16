@@ -15,7 +15,7 @@ import {
   CreateRoverSchema,
   UpdateCompetitionSchema,
   UpdateRoverSchema,
-} from "@/schema/auth";
+} from "@workspace/types";
 
 export const competitionRoute = createTRPCRouter({
   createCompetition: protectedProcedure

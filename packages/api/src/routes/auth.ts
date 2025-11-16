@@ -1,4 +1,4 @@
-import { RegisterSchema } from "../schema/auth";
+import { RegisterSchema } from "@workspace/types";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { users } from "@workspace/db/schema";

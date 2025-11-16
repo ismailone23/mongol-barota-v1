@@ -18,7 +18,7 @@ export const teamMembers = pgTable("team_members", (t) => ({
   phone: t.varchar("phone"),
   linkedin: t.varchar("linkedin"),
   github: t.varchar("github"),
-  about: t.varchar("about").notNull(),
+  about: t.varchar("about"),
   createdAt: t
     .timestamp("created_at", { withTimezone: true, mode: "date" })
     .defaultNow()

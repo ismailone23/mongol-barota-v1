@@ -6,6 +6,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import Account from "@/components/account";
+import Team from "@/components/teams/team";
 
 export default function Page() {
   return (
@@ -30,7 +31,9 @@ export default function Page() {
             <TabsContent value="competitions">hello</TabsContent>
             <TabsContent value="achievements">hello</TabsContent>
             <TabsContent value="rover">hello</TabsContent>
-            <TabsContent value="team">hello</TabsContent>
+            <TabsContent value="team">
+              <Team />
+            </TabsContent>
             <TabsContent value="sponsors">hello</TabsContent>
           </Tabs>
         </div>

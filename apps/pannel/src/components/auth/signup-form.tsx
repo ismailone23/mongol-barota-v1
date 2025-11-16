@@ -11,7 +11,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { RegisterSchema } from "@workspace/api/schema/auth";
+import { RegisterSchema } from "@workspace/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { register } from "@/utils";

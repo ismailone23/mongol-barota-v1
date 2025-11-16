@@ -21,7 +21,7 @@ import FormError from "./form-error";
 import FormSuccess from "./form-success";
 import { useForm } from "react-hook-form";
 import React, { useState, useTransition } from "react";
-import { LoginSchema } from "@workspace/api/schema";
+import { LoginSchema } from "@workspace/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";

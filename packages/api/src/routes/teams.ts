@@ -2,11 +2,11 @@ import {
   CreateSponsorSchema,
   CreateSponsorshipPlanSchema,
   CreateTeamMemberSchema,
-  MemberAt,
+  memberAtEnum,
   UpdateSponsorSchema,
   UpdateSponsorshipPlanSchema,
   UpdateTeamMemberSchema,
-} from "../schema/auth";
+} from "@workspace/types";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import {
   participatedCompetitions,
@@ -14,73 +14,139 @@ import {
   sponsorshipPlans,
   teamMembers,
 } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc, or, isNull, gte, asc } from "drizzle-orm";
 import * as z from "zod";
 import { TRPCError } from "@trpc/server";
 
 export const teamRoute = createTRPCRouter({
-  getAllteams: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.db.select().from(teamMembers);
-  }),
-  getSpecificMember: publicProcedure
+  getAllMembers: publicProcedure
     .input(
       z.object({
-        memberAt: MemberAt,
+        limit: z.number().min(1).max(100).default(10),
+        cursor: z.number().nullish().default(0),
       })
     )
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit;
+      const cursor = input.cursor ?? 0;
+
+      const members = await ctx.db
+        .select()
+        .from(teamMembers)
+        .where(
+          or(isNull(teamMembers.until), gte(teamMembers.until, new Date()))
+        )
+        .orderBy(desc(teamMembers.from))
+        .limit(limit + 1)
+        .offset(cursor);
+
+      let nextCursor: number | undefined = undefined;
+      if (members.length > limit) {
+        members.pop(); // Remove extra item
+        nextCursor = cursor + limit;
+      }
+
+      return {
+        members,
+        nextCursor,
+      };
+    }),
+  // Get all members (simple)
+  getMembers: publicProcedure.query(async ({ ctx }) => {
+    return await ctx.db
+      .select()
+      .from(teamMembers)
+      .orderBy(desc(teamMembers.from));
+  }),
+
+  // Get single member
+  getMember: publicProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const [member] = await ctx.db
+        .select()
+        .from(teamMembers)
+        .where(eq(teamMembers.id, input.id));
+
+      if (!member) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team member not found",
+        });
+      }
+
+      return member;
+    }),
+
+  // Get members by type
+  getMembersByType: publicProcedure
+    .input(z.object({ memberAt: memberAtEnum }))
     .query(async ({ ctx, input }) => {
       return await ctx.db
         .select()
         .from(teamMembers)
-        .where(eq(teamMembers.memberAt, input.memberAt));
+        .where(eq(teamMembers.memberAt, input.memberAt))
+        .orderBy(asc(teamMembers.name));
     }),
+
+  // Create member
   createMember: protectedProcedure
     .input(CreateTeamMemberSchema)
     .mutation(async ({ ctx, input }) => {
-      const newMember = await ctx.db
+      const [newMember] = await ctx.db
         .insert(teamMembers)
         .values(input)
         .returning();
+
       if (!newMember) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Internal server error",
+          message: "Failed to create member",
         });
       }
-      return { newMember, message: "New member Added" };
+
+      return { newMember, message: "New member added successfully" };
     }),
 
+  // Update member
   updateMember: protectedProcedure
     .input(UpdateTeamMemberSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
-      const newMember = await ctx.db
+
+      const [updatedMember] = await ctx.db
         .update(teamMembers)
         .set(data)
         .where(eq(teamMembers.id, id))
         .returning();
-      if (!newMember) {
+
+      if (!updatedMember) {
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Internal server error",
+          code: "NOT_FOUND",
+          message: "Team member not found",
         });
       }
-      return { newMember, message: "New member Added" };
+
+      return { updatedMember, message: "Member updated successfully" };
     }),
+
+  // Delete member
   deleteMember: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const [deleteUser] = await ctx.db
+      const [deletedMember] = await ctx.db
         .delete(teamMembers)
         .where(eq(teamMembers.id, input.id))
         .returning();
-      if (!deleteUser) {
+
+      if (!deletedMember) {
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Server error",
+          code: "NOT_FOUND",
+          message: "Team member not found",
         });
       }
-      return { message: "Member Removed" };
+
+      return { message: "Member deleted successfully" };
     }),
 
   createSponsorshipPlan: protectedProcedure

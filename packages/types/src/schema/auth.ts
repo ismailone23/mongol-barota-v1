@@ -9,7 +9,7 @@ export const RegisterSchema = z.object({
   mistid: z.string().min(6),
   password: z.string().min(4),
 });
-export const MemberAt = z.enum([
+export const memberAtEnum = z.enum([
   "LT",
   "FA",
   "MT",
@@ -19,26 +19,6 @@ export const MemberAt = z.enum([
   "MgT",
   "CT",
 ]);
-export const CreateTeamMemberSchema = z.object({
-  name: z.string(),
-  image: z.string(),
-  designation: z.string(),
-  department: z.string(),
-  memberAt: MemberAt,
-  about: z.string(),
-  description: z.string().nullable(),
-  email: z.string().nullable(),
-  phone: z.string().nullable(),
-  linkedin: z.string().nullable(),
-  github: z.string().nullable(),
-  from: z.date(),
-  until: z.date().nullable(),
-});
-
-// For updating (id required)
-export const UpdateTeamMemberSchema = CreateTeamMemberSchema.extend({
-  id: z.string(),
-});
 
 export const CreateSponsorshipPlanSchema = z.object({
   name: z.string().max(100),
@@ -120,3 +100,47 @@ export const UpdateCompetitionSchema = CreateCompetitionSchema.partial().extend(
     id: z.string().uuid("Invalid competition ID"),
   }
 );
+
+export const memberAtLabels = {
+  LT: "Leadership Team",
+  FA: "Faculty Advisor",
+  MT: "Mechanical Team",
+  ET: "Electrical Team",
+  ST: "Software Team",
+  ScT: "Scientific Team",
+  MgT: "Management Team",
+  CT: "Communication Team",
+};
+export type MemberAtKey = keyof typeof memberAtLabels;
+
+export const CreateTeamMemberSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  image: z.string().min(1, "Image URL is required"),
+  designation: z.string().min(1, "Designation is required"),
+  department: z.string().min(1, "Department is required"),
+  memberAt: z.enum(["LT", "FA", "MT", "ET", "ST", "ScT", "MgT", "CT"], {
+    required_error: "Member type is required",
+  }),
+  about: z.string().optional(),
+  description: z.string().optional(),
+  email: z.string().email("Must be a valid email").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
+  linkedin: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  github: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  from: z.date({
+    required_error: "Start date is required",
+  }),
+  until: z.date().optional(),
+});
+
+// Update Team Member Schema - extends Create schema with UUID id
+export const UpdateTeamMemberSchema = CreateTeamMemberSchema.extend({
+  id: z.string().uuid("Invalid member ID"),
+});
+
+// Type exports
+export type CreateTeamMemberInput = z.infer<typeof CreateTeamMemberSchema>;
+export type UpdateTeamMemberInput = z.infer<typeof UpdateTeamMemberSchema>;

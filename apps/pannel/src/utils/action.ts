@@ -1,6 +1,6 @@
 "use server";
-import { api, trpc } from "@/trpc/server";
-import { LoginSchema, RegisterSchema } from "@workspace/api/schema/auth";
+import { api } from "@/trpc/server";
+import { LoginSchema, RegisterSchema } from "@workspace/types";
 import { signIn } from "@workspace/auth/index";
 import { AuthError } from "next-auth";
 // import { signIn } from "next-auth/react";

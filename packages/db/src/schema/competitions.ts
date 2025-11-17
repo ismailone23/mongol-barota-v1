@@ -48,8 +48,8 @@ export const participatedCompetitions = pgTable(
   })
 );
 
-export type ParticipatedCompetitions =
-  typeof participatedCompetitions.$inferSelect;
+export type CompetitionsInsert = typeof participatedCompetitions.$inferInsert;
+export type CompetitionsSelect = typeof participatedCompetitions.$inferSelect;
 
 export const participatedCompetitionsRelations = relations(
   participatedCompetitions,

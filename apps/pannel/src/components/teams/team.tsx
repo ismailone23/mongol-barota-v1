@@ -60,7 +60,7 @@ export default function Team() {
   return (
     <div>
       <div className="bg-white rounded-lg ">
-        <div className="p-6 flex items-center justify-between">
+        <div className="py-4 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">
               Team Members

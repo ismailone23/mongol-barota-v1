@@ -7,6 +7,10 @@ import {
 } from "@workspace/ui/components/tabs";
 import Account from "@/components/account";
 import Team from "@/components/teams/team";
+import Rover from "@/components/rover";
+import Competition from "@/components/competitions";
+import Sponser from "@/components/sponsers";
+import Plan from "@/components/plan";
 
 export default function Page() {
   return (
@@ -20,21 +24,29 @@ export default function Page() {
             <TabsList>
               <TabsTrigger value="account">Verify Account</TabsTrigger>
               <TabsTrigger value="competitions">Competitions</TabsTrigger>
-              <TabsTrigger value="achievements">Achievements</TabsTrigger>
               <TabsTrigger value="rover">Rover</TabsTrigger>
               <TabsTrigger value="team">Team</TabsTrigger>
               <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
+              <TabsTrigger value="plan">Plans</TabsTrigger>
             </TabsList>
             <TabsContent value="account">
               <Account />
             </TabsContent>
-            <TabsContent value="competitions">hello</TabsContent>
-            <TabsContent value="achievements">hello</TabsContent>
-            <TabsContent value="rover">hello</TabsContent>
+            <TabsContent value="competitions">
+              <Competition />
+            </TabsContent>
+            <TabsContent value="rover">
+              <Rover />
+            </TabsContent>
             <TabsContent value="team">
               <Team />
             </TabsContent>
-            <TabsContent value="sponsors">hello</TabsContent>
+            <TabsContent value="sponsors">
+              <Sponser />
+            </TabsContent>
+            <TabsContent value="plan">
+              <Plan />
+            </TabsContent>
           </Tabs>
         </div>
       </div>

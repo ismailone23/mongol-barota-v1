@@ -22,6 +22,13 @@
       "when": 1763315659446,
       "tag": "0002_living_the_hunter",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1763359396620,
+      "tag": "0003_brown_red_hulk",
+      "breakpoints": true
     }
   ]
 }

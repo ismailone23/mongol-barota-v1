@@ -338,11 +338,11 @@ export const teamRoute = createTRPCRouter({
         competition: participatedCompetitions,
       })
       .from(sponsors)
-      .leftJoin(
+      .innerJoin(
         sponsorshipPlans,
         eq(sponsors.sponsorshipPlan, sponsorshipPlans.id)
       )
-      .leftJoin(
+      .innerJoin(
         participatedCompetitions,
         eq(sponsors.competitionId, participatedCompetitions.id)
       )

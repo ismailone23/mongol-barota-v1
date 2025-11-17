@@ -6,7 +6,11 @@ export const rovers = pgTable("rover", (t) => ({
   id: t.uuid("id").notNull().defaultRandom().primaryKey().unique(),
   image: t.text("image").notNull(),
   name: t.varchar("name", { length: 100 }).notNull(),
-  tag: t.varchar("tag", { length: 100 }).notNull(),
+  tag: t
+    .text("tag")
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
   description: t.text("description").notNull(),
   weight: t.text("weight").notNull(),
   power: t.text("power").notNull(),
@@ -31,6 +35,7 @@ export const rovers = pgTable("rover", (t) => ({
 }));
 
 export type Rovers = typeof rovers.$inferSelect;
+export type RoversInsert = typeof rovers.$inferInsert;
 
 // Rovers relation - one-to-many with competitions
 export const roverCompetitionRelation = relations(rovers, ({ many }) => ({

@@ -29,16 +29,17 @@ export const CreateSponsorshipPlanSchema = z.object({
   iconColor: z.string().max(50),
   iconBgColor: z.string().max(50),
   borderColor: z.string().max(50).optional(),
-  isPopular: z.boolean().default(false),
-  displayOrder: z.number().int().default(0),
-  benefits: z.string().array().default([]),
-  isActive: z.boolean().default(false),
+  isPopular: z.boolean(),
+  displayOrder: z.number(),
+  benefits: z.string().array(),
+  isActive: z.boolean(),
 });
 
 export const UpdateSponsorshipPlanSchema =
   CreateSponsorshipPlanSchema.partial().extend({
     id: z.string().uuid(),
   });
+
 export const CreateSponsorSchema = z.object({
   sponsorCompanyName: z.string().min(1, "Company name is required"),
   sponsorCompanyDesctiption: z.string().min(1, "Description is required"),
@@ -55,7 +56,7 @@ export const UpdateSponsorSchema = CreateSponsorSchema.partial().extend({
 export const CreateRoverSchema = z.object({
   image: z.string().url("Invalid image URL"),
   name: z.string().min(1, "Rover name is required").max(100),
-  tag: z.string().min(1, "Tag is required").max(100),
+  tag: z.string().array(),
   description: z.string().min(1, "Description is required"),
   weight: z.string().min(1, "Weight is required"),
   power: z.string().min(1, "Power is required"),
@@ -63,8 +64,8 @@ export const CreateRoverSchema = z.object({
   dimentions: z.string().min(1, "Dimensions are required"),
   from: z.date(),
   until: z.date().optional(),
-  keyAchievements: z.string().array().default([]),
-  features: z.string().array().default([]),
+  keyAchievements: z.string().array(),
+  features: z.string().array(),
 });
 
 export const UpdateRoverSchema = CreateRoverSchema.partial().extend({
@@ -91,7 +92,7 @@ export const CreateCompetitionSchema = z.object({
   color: z.string().min(1, "Color is required"),
   bgColor: z.string().min(1, "Background color is required"),
   icon: z.string().min(1, "Icon is required"),
-  highlights: z.string().array().default([]),
+  highlights: z.string().array(),
   participationYear: z.date(),
 });
 

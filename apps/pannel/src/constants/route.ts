@@ -1,5 +1,52 @@
+import {
+  Award,
+  Crown,
+  Flame,
+  Medal,
+  Star,
+  Target,
+  Trophy,
+  Zap,
+} from "lucide-react";
+
 export const authRoutes = ["/auth/login", "/auth/signup"];
 
 export const apiAuthPrefixs = "/api/auth";
 
 export const DEFAULT_REDIRECT_ROUTE = "/";
+export const tailwindColors = [
+  { name: "Red", value: "red-500", hex: "#ef4444" },
+  { name: "Orange", value: "orange-500", hex: "#f97316" },
+  { name: "Amber", value: "amber-500", hex: "#f59e0b" },
+  { name: "Yellow", value: "yellow-500", hex: "#eab308" },
+  { name: "Lime", value: "lime-500", hex: "#84cc16" },
+  { name: "Green", value: "green-500", hex: "#22c55e" },
+  { name: "Emerald", value: "emerald-500", hex: "#10b981" },
+  { name: "Teal", value: "teal-500", hex: "#14b8a6" },
+  { name: "Cyan", value: "cyan-500", hex: "#06b6d4" },
+  { name: "Sky", value: "sky-500", hex: "#0ea5e9" },
+  { name: "Blue", value: "blue-500", hex: "#3b82f6" },
+  { name: "Indigo", value: "indigo-500", hex: "#6366f1" },
+  { name: "Violet", value: "violet-500", hex: "#8b5cf6" },
+  { name: "Purple", value: "purple-500", hex: "#a855f7" },
+  { name: "Fuchsia", value: "fuchsia-500", hex: "#d946ef" },
+  { name: "Pink", value: "pink-500", hex: "#ec4899" },
+  { name: "Rose", value: "rose-500", hex: "#f43f5e" },
+  { name: "Slate", value: "slate-500", hex: "#64748b" },
+  { name: "Gray", value: "gray-500", hex: "#6b7280" },
+  { name: "Zinc", value: "zinc-500", hex: "#71717a" },
+  { name: "Neutral", value: "neutral-500", hex: "#737373" },
+  { name: "Stone", value: "stone-500", hex: "#78716c" },
+  { name: "White", value: "white", hex: "#fff" },
+];
+
+export const competitionIcons = [
+  { name: "Trophy", value: "Trophy", icon: Trophy },
+  { name: "Medal", value: "Medal", icon: Medal },
+  { name: "Award", value: "Award", icon: Award },
+  { name: "Star", value: "Star", icon: Star },
+  { name: "Target", value: "Target", icon: Target },
+  { name: "Flame", value: "Flame", icon: Flame },
+  { name: "Zap", value: "Zap", icon: Zap },
+  { name: "Crown", value: "Crown", icon: Crown },
+];

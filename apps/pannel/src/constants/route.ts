@@ -14,6 +14,7 @@ export const authRoutes = ["/auth/login", "/auth/signup"];
 export const apiAuthPrefixs = "/api/auth";
 
 export const DEFAULT_REDIRECT_ROUTE = "/";
+
 export const tailwindColors = [
   { name: "Red", value: "red-500", hex: "#ef4444" },
   { name: "Orange", value: "orange-500", hex: "#f97316" },

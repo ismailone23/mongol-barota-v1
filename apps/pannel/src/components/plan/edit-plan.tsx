@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateSponsorshipPlanSchema } from "@workspace/types";
-import { SponsorshipPlans } from "@workspace/db/schema";
+import { UpdatePlanSchema } from "@workspace/types";
+import { PlansSelect } from "@workspace/db/schema";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -37,24 +37,24 @@ import {
 } from "@workspace/ui/components/select";
 import { competitionIcons, tailwindColors } from "@/constants/route";
 
-type FormValues = z.infer<typeof UpdateSponsorshipPlanSchema>;
+type FormValues = z.infer<typeof UpdatePlanSchema>;
 
-interface EditSponsorshipPlanDialogProps {
-  plan: SponsorshipPlans;
+interface EditPlanDialogProps {
+  plan: PlansSelect;
   trigger?: React.ReactNode;
   refetch: any;
 }
 
-export default function EditSponsorshipPlanDialog({
+export default function EditPlanDialog({
   refetch,
   plan,
   trigger,
-}: EditSponsorshipPlanDialogProps) {
+}: EditPlanDialogProps) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
 
   const updatePlan = useMutation(
-    trpc.team.updateSponsorshipPlan.mutationOptions({
+    trpc.team.updatePlan.mutationOptions({
       onMutate: () => {
         const toastId = toast.loading("Updating plan...");
         return { toastId };
@@ -74,14 +74,14 @@ export default function EditSponsorshipPlanDialog({
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(UpdateSponsorshipPlanSchema),
+    resolver: zodResolver(UpdatePlanSchema),
     defaultValues: {
       id: plan.id,
       name: plan.name,
       subtitle: plan.subtitle || "",
       price: plan.price,
       priceLabel: plan.priceLabel || "",
-      iconType: plan.iconType,
+      icon: plan.icon,
       iconColor: plan.iconColor,
       iconBgColor: plan.iconBgColor,
       borderColor: plan.borderColor || "",
@@ -99,7 +99,7 @@ export default function EditSponsorshipPlanDialog({
       subtitle: plan.subtitle || "",
       price: plan.price,
       priceLabel: plan.priceLabel || "",
-      iconType: plan.iconType,
+      icon: plan.icon,
       iconColor: plan.iconColor,
       iconBgColor: plan.iconBgColor,
       borderColor: plan.borderColor || "",
@@ -126,7 +126,7 @@ export default function EditSponsorshipPlanDialog({
       <DialogContent className="w-full max-w-full sm:max-w-[640px] md:max-w-[760px] max-h-[80vh] overflow-y-auto">
         <div>
           <DialogHeader className="mb-5">
-            <DialogTitle>Edit Sponsorship Plan</DialogTitle>
+            <DialogTitle>Edit Plan</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -205,7 +205,7 @@ export default function EditSponsorshipPlanDialog({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
-                  name="iconType"
+                  name="icon"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Select Icon</FormLabel>

@@ -1,3 +1,14 @@
+import {
+  Award,
+  Crown,
+  Flame,
+  Medal,
+  Star,
+  Target,
+  Trophy,
+  Zap,
+} from "lucide-react";
+
 export const APP_URL = "https://mongol-barota.mist.ac.bd";
 export const tailwindColors = [
   { name: "Red", value: "red-500", hex: "#ef4444" },
@@ -23,4 +34,15 @@ export const tailwindColors = [
   { name: "Neutral", value: "neutral-500", hex: "#737373" },
   { name: "Stone", value: "stone-500", hex: "#78716c" },
   { name: "White", value: "white", hex: "#fff" },
+];
+
+export const competitionIcons = [
+  { name: "Trophy", value: "Trophy", icon: Trophy },
+  { name: "Medal", value: "Medal", icon: Medal },
+  { name: "Award", value: "Award", icon: Award },
+  { name: "Star", value: "Star", icon: Star },
+  { name: "Target", value: "Target", icon: Target },
+  { name: "Flame", value: "Flame", icon: Flame },
+  { name: "Zap", value: "Zap", icon: Zap },
+  { name: "Crown", value: "Crown", icon: Crown },
 ];

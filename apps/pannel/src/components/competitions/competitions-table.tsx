@@ -52,9 +52,7 @@ export default function CompetitionTable({
   const deleteCompetitionCallback = useCallback(
     (competition: CompetitionsSelect) => {
       if (
-        confirm(
-          `Are you sure that you want to delete ${competition.competitionName}?`
-        )
+        confirm(`Are you sure that you want to delete ${competition.name}?`)
       ) {
         deleteCompetition.mutate({ id: competition.id });
       }
@@ -96,27 +94,27 @@ export default function CompetitionTable({
                 <TableCell>
                   <img
                     src={competition.image}
-                    alt={competition.competitionName}
+                    alt={competition.name}
                     className="w-10 h-10 rounded object-cover"
                   />
                 </TableCell>
                 <TableCell className="font-medium">
-                  {competition.competitionName}
+                  {competition.name}
                 </TableCell>
-                <TableCell>{competition.competitionRegionName}</TableCell>
+                <TableCell>{competition.region}</TableCell>
                 <TableCell>{competition.location}</TableCell>
                 <TableCell>
-                  {new Date(competition.participationYear).getFullYear()}
+                  {new Date(competition.year).getFullYear()}
                 </TableCell>
                 <TableCell>
                   <span
                     className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                     style={{
-                      backgroundColor: competition.bgColor,
-                      color: competition.color,
+                      backgroundColor: competition.iconBg,
+                      color: competition.iconColor,
                     }}
                   >
-                    {competition.competitionResult}
+                    {competition.result}
                   </span>
                 </TableCell>
                 <TableCell>

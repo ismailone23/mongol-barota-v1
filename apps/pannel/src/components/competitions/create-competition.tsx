@@ -1,6 +1,11 @@
+// ============= CREATE COMPETITION DIALOG =============
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateCompetitionSchema, competitionRegions } from "@workspace/types";
+import {
+  CreateCompetitionSchema,
+  RegionKey,
+  RegionRecord,
+} from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -17,6 +22,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@workspace/ui/components/form";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -47,6 +53,11 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
     trpc.competition.getRovers.queryOptions()
   );
 
+  // Fetch team members for the multi-select
+  const { data: teamMembers, isLoading: teamMembersLoading } = useQuery(
+    trpc.team.getMembers.queryOptions()
+  );
+
   const createCompetition = useMutation(
     trpc.competition.createCompetition.mutationOptions({
       onMutate: () => {
@@ -71,17 +82,18 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(CreateCompetitionSchema),
     defaultValues: {
-      competitionRegionName: undefined,
-      competitionName: "",
-      competitionDescription: "",
+      region: "urc",
+      name: "",
+      description: "",
       location: "",
       roverId: "",
-      competitionResult: "",
+      result: "",
       image: "",
-      color: "#84cc16",
-      bgColor: "#fff",
+      iconColor: "#84cc16",
+      iconBg: "#fff",
       icon: "",
-      participationYear: new Date(),
+      year: new Date(),
+      teamMemberIds: [],
     },
   });
 
@@ -111,7 +123,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
             >
               <FormField
                 control={form.control}
-                name="competitionRegionName"
+                name="region"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Competition Region</FormLabel>
@@ -124,9 +136,9 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                           <SelectValue placeholder="Select competition region" />
                         </SelectTrigger>
                         <SelectContent className="w-full">
-                          {competitionRegions.map((region) => (
+                          {Object.keys(RegionRecord).map((region) => (
                             <SelectItem value={region} key={region}>
-                              {region}
+                              {RegionRecord[region as RegionKey]}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -139,7 +151,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="competitionName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Competition Name</FormLabel>
@@ -157,7 +169,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="competitionDescription"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Description</FormLabel>
@@ -197,7 +209,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="participationYear"
+                    name="year"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Participation Year</FormLabel>
@@ -256,9 +268,73 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                 )}
               />
 
+              {/* NEW: Team Members Multi-Select */}
               <FormField
                 control={form.control}
-                name="competitionResult"
+                name="teamMemberIds"
+                render={({ field }) => {
+                  const selectedIds = field.value || [];
+
+                  const toggleMember = (memberId: string) => {
+                    const newIds = selectedIds.includes(memberId)
+                      ? selectedIds.filter((id) => id !== memberId)
+                      : [...selectedIds, memberId];
+                    field.onChange(newIds);
+                  };
+
+                  return (
+                    <FormItem>
+                      <FormLabel>Team Members</FormLabel>
+                      <FormDescription>
+                        Select team members who participated in this competition
+                      </FormDescription>
+                      <FormControl>
+                        <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
+                          {teamMembersLoading ? (
+                            <p className="text-sm text-muted-foreground">
+                              Loading team members...
+                            </p>
+                          ) : !teamMembers || teamMembers.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">
+                              No team members available
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {teamMembers.map((member) => (
+                                <div
+                                  key={member.id}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <Checkbox
+                                    checked={selectedIds.includes(member.id)}
+                                    onCheckedChange={() =>
+                                      toggleMember(member.id)
+                                    }
+                                  />
+                                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                                    {member.name} - {member.role}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      {selectedIds.length > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          {selectedIds.length} member
+                          {selectedIds.length !== 1 ? "s" : ""} selected
+                        </p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+
+              <FormField
+                control={form.control}
+                name="result"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Competition Result</FormLabel>
@@ -309,8 +385,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                         <SelectContent className="w-full">
                           {competitionIcons.map(({ icon: Icon, value }, i) => (
                             <SelectItem value={value} key={i}>
-                              <Icon className="w-4 h-4" />
-                              {value}
+                              <Icon className="w-4 h-4" /> {value}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -325,10 +400,10 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="color"
+                    name="iconColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Color</FormLabel>
+                        <FormLabel>Icon Color</FormLabel>
                         <FormControl>
                           <Select
                             value={field.value}
@@ -355,7 +430,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="bgColor"
+                    name="iconBg"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Background Color</FormLabel>
@@ -468,7 +543,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                   Cancel
                 </Button>
                 <Button className="cursor-pointer" type="submit">
-                  Create Competition
+                  Update Competition
                 </Button>
               </div>
             </form>

@@ -1,9 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CreateTeamMemberSchema,
-  MemberAtKey,
-  memberAtLabels,
+  CreateMemberSchema,
+  SubTeamKey,
+  SubTeamRecord,
 } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -38,7 +38,7 @@ import { useTRPC } from "@/trpc/react";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
 
-type FormValues = z.infer<typeof CreateTeamMemberSchema>;
+type FormValues = z.infer<typeof CreateMemberSchema>;
 
 export default function CreateMemberDialog({ refetch }: { refetch: any }) {
   const trpc = useTRPC();
@@ -66,21 +66,19 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(CreateTeamMemberSchema),
+    resolver: zodResolver(CreateMemberSchema),
     defaultValues: {
       name: "",
       image: "",
-      designation: "",
       department: "",
-      memberAt: "ST",
+      subTeam: "ST",
       about: "",
-      description: "",
       email: "",
       phone: "",
       linkedin: "",
       github: "",
-      from: new Date(),
-      until: undefined,
+      bio: "",
+      title: "",
     },
   });
 
@@ -108,23 +106,42 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6 w-full max-w-full"
             >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="John Doe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="John Doe"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Lt Col | Lecturer"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -146,10 +163,10 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="designation"
+                name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Designation</FormLabel>
+                    <FormLabel>Role</FormLabel>
                     <FormControl>
                       <Input
                         className="w-full"
@@ -186,10 +203,10 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
                 <div className="w-full sm:w-56">
                   <FormField
                     control={form.control}
-                    name="memberAt"
+                    name="subTeam"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Member Type</FormLabel>
+                        <FormLabel>Sub Team</FormLabel>
                         <FormControl>
                           <Select
                             value={field.value ?? ""}
@@ -199,9 +216,9 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
                               <SelectValue placeholder="Select member type" />
                             </SelectTrigger>
                             <SelectContent className="w-full">
-                              {Object.keys(memberAtLabels).map((label) => (
+                              {Object.keys(SubTeamRecord).map((label) => (
                                 <SelectItem value={label} key={label}>
-                                  {memberAtLabels[label as MemberAtKey]}
+                                  {SubTeamRecord[label as SubTeamKey]}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -234,14 +251,14 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="description"
+                name="bio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (optional)</FormLabel>
+                    <FormLabel>Bio</FormLabel>
                     <FormControl>
                       <Textarea
                         className="w-full"
-                        placeholder="Long description..."
+                        placeholder="Long bio..."
                         {...field}
                       />
                     </FormControl>
@@ -321,72 +338,6 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
                   </FormItem>
                 )}
               />
-
-              <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
-                <div className="flex-1">
-                  <FormField
-                    control={form.control}
-                    name="from"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Start Date</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            className="w-full"
-                            value={
-                              field.value
-                                ? new Date(field.value)
-                                    .toISOString()
-                                    .split("T")[0]
-                                : ""
-                            }
-                            onChange={(e) => {
-                              const date = e.target.value
-                                ? new Date(e.target.value)
-                                : new Date();
-                              field.onChange(date);
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <FormField
-                    control={form.control}
-                    name="until"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>End Date (optional)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            className="w-full"
-                            value={
-                              field.value
-                                ? new Date(field.value)
-                                    .toISOString()
-                                    .split("T")[0]
-                                : ""
-                            }
-                            onChange={(e) => {
-                              const date = e.target.value
-                                ? new Date(e.target.value)
-                                : undefined;
-                              field.onChange(date);
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
 
               <div className="w-full items-end justify-end flex gap-2">
                 <Button

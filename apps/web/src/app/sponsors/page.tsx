@@ -1,3 +1,7 @@
+"use client";
+import SponserTiers from "@/components/sponser-tiers";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
@@ -23,86 +27,87 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import PrevSponser from "../../components/prev-sponser";
 
-const sponsorshipTiers = [
-  {
-    name: "Title Sponsor",
-    subtitle: "Platinum Partner",
-    amount: "BDT 15,00,000",
-    amountText: "BDT Fifteen Lacs Only",
-    icon: Crown,
-    color: "text-purple-600",
-    bgColor: "bg-purple-100 dark:bg-purple-950",
-    borderColor: "border-purple-200 dark:border-purple-800",
-    popular: true,
-    benefitCount: 12,
-    benefits: [
-      "Logo on main rover body (proportional)",
-      "Corporate mention in print and media",
-      "Company banner in particular events and venue",
-      "Logo on posters and banners",
-      "Advertisement at the start of the seminar",
-      "Company stall in the venue (size on discussion)",
-      "Promotional advertisement in the MM screen",
-      "Logo on gift hampers and packages",
-      "Logo on merchandise (non-commercial)",
-      "Logo on merchandise (commercial)",
-      "Brand/product value survey/analysis",
-      "Advertisement on Digital Platforms, Social Media and event",
-    ],
-  },
-  {
-    name: "Gold Sponsor",
-    subtitle: "Gold Partner",
-    amount: "BDT 10,00,000",
-    amountText: "BDT Ten Lacs Only",
-    icon: Award,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100 dark:bg-yellow-950",
-    borderColor: "border-yellow-200 dark:border-yellow-800",
-    benefitCount: 9,
-    benefits: [
-      "Logo on main rover body (proportional)",
-      "Corporate mention in print and media",
-      "Company banner in particular events and venue",
-      "Logo on posters and banners",
-      "Advertisement at the start of the seminar",
-      "Logo on gift hampers and packages",
-      "Logo on merchandise (non-commercial)",
-      "Brand/product value survey/analysis",
-      "Advertisement on Digital Platforms, Social Media and event",
-    ],
-  },
-  {
-    name: "Silver Sponsor",
-    subtitle: "Silver Partner",
-    amount: "BDT 5,00,000",
-    amountText: "BDT Five Lacs Only",
-    icon: Star,
-    color: "text-gray-600",
-    bgColor: "bg-gray-100 dark:bg-gray-900",
-    borderColor: "border-gray-200 dark:border-gray-800",
-    benefitCount: 6,
-    benefits: [
-      "Logo on main rover body (proportional)",
-      "Corporate mention in print and media",
-      "Logo on posters and banners",
-      "Logo on gift hampers and packages",
-      "Logo on merchandise (non-commercial)",
-      "Advertisement on Digital Platforms, Social Media and event",
-    ],
-  },
-];
+// const sponsorshipTiers = [
+//   {
+//     name: "Title Sponsor",
+//     subtitle: "Platinum Partner",
+//     amount: "BDT 15,00,000",
+//     amountText: "BDT Fifteen Lacs Only",
+//     icon: Crown,
+//     color: "text-purple-600",
+//     bgColor: "bg-purple-100 dark:bg-purple-950",
+//     borderColor: "border-purple-200 dark:border-purple-800",
+//     popular: true,
+//     benefitCount: 12,
+//     benefits: [
+//       "Logo on main rover body (proportional)",
+//       "Corporate mention in print and media",
+//       "Company banner in particular events and venue",
+//       "Logo on posters and banners",
+//       "Advertisement at the start of the seminar",
+//       "Company stall in the venue (size on discussion)",
+//       "Promotional advertisement in the MM screen",
+//       "Logo on gift hampers and packages",
+//       "Logo on merchandise (non-commercial)",
+//       "Logo on merchandise (commercial)",
+//       "Brand/product value survey/analysis",
+//       "Advertisement on Digital Platforms, Social Media and event",
+//     ],
+//   },
+//   {
+//     name: "Gold Sponsor",
+//     subtitle: "Gold Partner",
+//     amount: "BDT 10,00,000",
+//     amountText: "BDT Ten Lacs Only",
+//     icon: Award,
+//     color: "text-yellow-600",
+//     bgColor: "bg-yellow-100 dark:bg-yellow-950",
+//     borderColor: "border-yellow-200 dark:border-yellow-800",
+//     benefitCount: 9,
+//     benefits: [
+//       "Logo on main rover body (proportional)",
+//       "Corporate mention in print and media",
+//       "Company banner in particular events and venue",
+//       "Logo on posters and banners",
+//       "Advertisement at the start of the seminar",
+//       "Logo on gift hampers and packages",
+//       "Logo on merchandise (non-commercial)",
+//       "Brand/product value survey/analysis",
+//       "Advertisement on Digital Platforms, Social Media and event",
+//     ],
+//   },
+//   {
+//     name: "Silver Sponsor",
+//     subtitle: "Silver Partner",
+//     amount: "BDT 5,00,000",
+//     amountText: "BDT Five Lacs Only",
+//     icon: Star,
+//     color: "text-gray-600",
+//     bgColor: "bg-gray-100 dark:bg-gray-900",
+//     borderColor: "border-gray-200 dark:border-gray-800",
+//     benefitCount: 6,
+//     benefits: [
+//       "Logo on main rover body (proportional)",
+//       "Corporate mention in print and media",
+//       "Logo on posters and banners",
+//       "Logo on gift hampers and packages",
+//       "Logo on merchandise (non-commercial)",
+//       "Advertisement on Digital Platforms, Social Media and event",
+//     ],
+//   },
+// ];
 
-const previousSponsors = [
-  {
-    name: "Military Institute of Science and Technology",
-    // tier: "Institutional Support",
-    logo: "/mist.png",
-    description: "Our home institution providing comprehensive support",
-    website: "https://mist.ac.bd",
-  },
-];
+// const previousSponsors = [
+//   {
+//     name: "Military Institute of Science and Technology",
+//     // tier: "Institutional Support",
+//     logo: "/mist.png",
+//     description: "Our home institution providing comprehensive support",
+//     website: "https://mist.ac.bd",
+//   },
+// ];
 
 // const budgetBreakdown = [
 //   { category: "Mechanical", amount: "BDT 4,87,400", percentage: 34.5 },
@@ -177,10 +182,17 @@ const sponsorshipBenefits = [
 ];
 
 export default function SponsorsPage() {
+  const trpc = useTRPC();
+  const { data: sponsorshipTiers, isLoading } = useQuery(
+    trpc.team.getPlans.queryOptions()
+  );
+  const { data: previousSponsors, isLoading: isSponserLoading } = useQuery(
+    trpc.team.getSponsors.queryOptions()
+  );
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-background via-background to-muted/20">
+      <section className="py-20 bg-linear-to-b from-background via-background to-muted/20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="outline" className="mb-6">
@@ -244,160 +256,13 @@ export default function SponsorsPage() {
       </section>
 
       {/* Previous Sponsors - Updated Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Our Support Network
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-              We're grateful for the institutional support that has helped us
-              achieve international recognition. Now we're seeking industry
-              partners to join us for the 2026 season.
-            </p>
-          </div>
-
-          <div className="max-w-2xl mx-auto">
-            {previousSponsors.map((sponsor, index) => (
-              <Card
-                key={index}
-                className="text-center hover:shadow-lg transition-shadow mb-8"
-              >
-                <CardContent className="p-8">
-                  <div className="relative h-20 mb-6 flex items-center justify-center">
-                    <Image
-                      src={sponsor.logo || "/placeholder.svg"}
-                      alt={`${sponsor.name} logo`}
-                      width={160}
-                      height={80}
-                      className="object-contain opacity-70 hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-                  <Badge variant="secondary" className="mb-3">
-                    {/* {sponsor.tier} */}
-                  </Badge>
-                  <h3 className="font-semibold mb-3">{sponsor.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {sponsor.description}
-                  </p>
-                  <Button asChild variant="ghost" size="sm">
-                    <Link
-                      href={sponsor.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Visit Website
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Call to Action for New Sponsors */}
-          <div className="max-w-3xl mx-auto mt-12">
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20">
-              <CardContent className="p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">
-                  Your Logo Could Be Here
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  Join us as a sponsor and gain visibility across international
-                  competitions, media coverage, and direct access to thousands
-                  of students and professionals. Be part of Bangladesh's space
-                  exploration journey.
-                </p>
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  <Link href="#sponsorship-tiers">
-                    Explore Sponsorship Packages
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      <PrevSponser
+        previousSponsors={previousSponsors}
+        isLoading={isSponserLoading}
+      />
 
       {/* Sponsorship Tiers */}
-      <section id="sponsorship-tiers" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Sponsorship Packages for 2026
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-              Choose the partnership level that aligns with your organization's
-              goals and budget
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {sponsorshipTiers.map((tier, index) => (
-              <Card
-                key={index}
-                className={`relative hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
-                  tier.popular ? "ring-2 ring-primary" : ""
-                } ${tier.borderColor}`}
-              >
-                {tier.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground">
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
-                <CardHeader className="text-center pb-4">
-                  <div
-                    className={`inline-flex items-center justify-center w-12 h-12 ${tier.bgColor} rounded-lg mb-4`}
-                  >
-                    <tier.icon className={`w-6 h-6 ${tier.color}`} />
-                  </div>
-                  <h3 className="text-xl font-bold">{tier.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {tier.subtitle}
-                  </p>
-                  <div className="mt-4">
-                    <div className="text-2xl font-bold text-primary">
-                      {tier.amount}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {tier.amountText}
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="mt-3">
-                    {tier.benefitCount} Benefits Included
-                  </Badge>
-                </CardHeader>
-                <CardContent className="pt-0 flex flex-col h-full">
-                  <ul className="space-y-3 flex-1">
-                    {tier.benefits.map((benefit, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm">
-                        <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span>{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    asChild
-                    className={`w-full mt-6 ${
-                      tier.popular
-                        ? "bg-primary hover:bg-primary/90"
-                        : "bg-secondary hover:bg-secondary/90"
-                    }`}
-                  >
-                    <Link href="/contact">Choose This Plan</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SponserTiers isLoading={isLoading} sponsorshipTiers={sponsorshipTiers} />
 
       {/* Sponsorship Benefits */}
       <section className="py-20 bg-muted/30">

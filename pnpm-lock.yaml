@@ -165,6 +165,12 @@ importers:
       '@workspace/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@workspace/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@workspace/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -424,6 +430,9 @@ importers:
 
   packages/types:
     dependencies:
+      '@workspace/db':
+        specifier: workspace:*
+        version: link:../db
       react:
         specifier: ^19.2.0
         version: 19.2.0

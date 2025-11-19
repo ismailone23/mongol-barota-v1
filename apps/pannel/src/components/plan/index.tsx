@@ -10,7 +10,7 @@ export default function Plan() {
   const trpc = useTRPC();
 
   const { data, isLoading, isError, error, refetch } = useQuery(
-    trpc.team.getSponsorshipPlans.queryOptions()
+    trpc.team.getPlans.queryOptions()
   );
 
   return (

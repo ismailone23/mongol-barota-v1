@@ -1,1 +1,0 @@
-ALTER TABLE "team_members" ALTER COLUMN "about" DROP NOT NULL;

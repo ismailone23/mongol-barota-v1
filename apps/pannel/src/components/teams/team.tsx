@@ -22,13 +22,13 @@ export default function Team() {
     error,
     refetch,
   } = useInfiniteQuery(
-    trpc.team.getAllMembers.infiniteQueryOptions(
+    trpc.team.getPaginatedMembers.infiniteQueryOptions(
       { limit: itemsPerPage },
       { getNextPageParam: (lastPage) => lastPage.nextCursor }
     )
   );
 
-  const members = data?.pages.flatMap((page) => page.members) ?? [];
+  const members = data?.pages.flatMap((page) => page.currentMembers) ?? [];
 
   // Auto-fetch pages as user navigates
   useEffect(() => {

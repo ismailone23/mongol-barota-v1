@@ -41,7 +41,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
 
   // Fetch plans and competitions for dropdowns
   const { data: plans, isLoading: plansLoading } = useQuery(
-    trpc.team.getSponsorshipPlans.queryOptions()
+    trpc.team.getPlans.queryOptions()
   );
   const { data: competitions, isLoading: competitionsLoading } = useQuery(
     trpc.competition.getCompetitions.queryOptions()
@@ -71,11 +71,11 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(CreateSponsorSchema),
     defaultValues: {
-      sponsorCompanyName: "",
-      sponsorCompanyDesctiption: "",
-      sponsorCompanyWebsite: "",
-      sponsorCompanylogo: "",
-      sponsorshipPlan: "",
+      name: "",
+      desctiption: "",
+      website: "",
+      logo: "",
+      plan: "",
       competitionId: undefined,
     },
   });
@@ -106,7 +106,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
             >
               <FormField
                 control={form.control}
-                name="sponsorCompanyName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Name</FormLabel>
@@ -124,7 +124,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="sponsorCompanyDesctiption"
+                name="desctiption"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Description</FormLabel>
@@ -143,7 +143,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="sponsorCompanyWebsite"
+                name="website"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Website</FormLabel>
@@ -162,7 +162,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="sponsorCompanylogo"
+                name="logo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Logo URL</FormLabel>
@@ -181,7 +181,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="sponsorshipPlan"
+                name="plan"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Sponsorship Plan</FormLabel>
@@ -243,7 +243,7 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
                               key={competition.id}
                               value={competition.id}
                             >
-                              {competition.competitionName}
+                              {competition.name}
                             </SelectItem>
                           ))
                         ) : (

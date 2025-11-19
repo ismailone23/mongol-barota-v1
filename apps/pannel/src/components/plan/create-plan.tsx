@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateSponsorshipPlanSchema } from "@workspace/types";
+import { CreatePlanSchema } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -36,18 +36,14 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 
-type FormValues = z.infer<typeof CreateSponsorshipPlanSchema>;
+type FormValues = z.infer<typeof CreatePlanSchema>;
 
-export default function CreateSponsorshipPlanDialog({
-  refetch,
-}: {
-  refetch: any;
-}) {
+export default function CreatePlanDialog({ refetch }: { refetch: any }) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
 
   const createPlan = useMutation(
-    trpc.team.createSponsorshipPlan.mutationOptions({
+    trpc.team.createPlan.mutationOptions({
       onMutate: () => {
         const toastId = toast.loading("Creating plan...");
         return { toastId };
@@ -68,13 +64,13 @@ export default function CreateSponsorshipPlanDialog({
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(CreateSponsorshipPlanSchema),
+    resolver: zodResolver(CreatePlanSchema),
     defaultValues: {
       name: "",
       subtitle: "",
       price: 0,
       priceLabel: "",
-      iconType: competitionIcons[2]?.value,
+      icon: competitionIcons[2]?.value,
       iconColor: tailwindColors[0]?.hex,
       iconBgColor: tailwindColors[2]?.hex,
       borderColor: tailwindColors[3]?.hex,
@@ -179,7 +175,7 @@ export default function CreateSponsorshipPlanDialog({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="iconType"
+                  name="icon"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Select Icon</FormLabel>

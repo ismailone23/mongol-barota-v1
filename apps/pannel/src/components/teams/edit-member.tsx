@@ -1,9 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  UpdateTeamMemberSchema,
-  MemberAtKey,
-  memberAtLabels,
+  UpdateMemberSchema,
+  SubTeamKey,
+  SubTeamRecord,
 } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -36,12 +36,12 @@ import { useMutation } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
-import { TeamMembersInsert } from "@workspace/db/schema";
+import { MemberInsert } from "@workspace/db/schema";
 
-type FormValues = z.infer<typeof UpdateTeamMemberSchema>;
+type FormValues = z.infer<typeof UpdateMemberSchema>;
 
 interface EditMemberDialogProps {
-  member: TeamMembersInsert;
+  member: MemberInsert;
   trigger?: React.ReactNode;
   refetch: any;
 }
@@ -75,22 +75,22 @@ export default function EditMemberDialog({
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(UpdateTeamMemberSchema),
+    resolver: zodResolver(UpdateMemberSchema),
     defaultValues: {
       id: member.id,
       name: member.name,
       image: member.image,
-      designation: member.designation,
+      title: member.title || "",
       department: member.department,
-      memberAt: member.memberAt,
+      subTeam: member.subTeam,
       about: member.about || "",
-      description: member.description || "",
+      bio: member.bio || "",
       email: member.email || "",
       phone: member.phone || "",
       linkedin: member.linkedin || "",
       github: member.github || "",
-      from: member.from,
-      until: member.until || undefined,
+      joined: member.joined || undefined,
+      left: member.left || undefined,
     },
   });
 
@@ -100,17 +100,17 @@ export default function EditMemberDialog({
       id: member.id,
       name: member.name,
       image: member.image,
-      designation: member.designation,
+      title: member.title || "",
       department: member.department,
-      memberAt: member.memberAt,
+      subTeam: member.subTeam,
       about: member.about || "",
-      description: member.description || "",
+      bio: member.bio || "",
       email: member.email || "",
       phone: member.phone || "",
       linkedin: member.linkedin || "",
       github: member.github || "",
-      from: member.from,
-      until: member.until || undefined,
+      joined: member.joined || undefined,
+      left: member.left || undefined,
     });
   }, [member, form]);
 
@@ -138,23 +138,43 @@ export default function EditMemberDialog({
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6 w-full max-w-full"
             >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="John Doe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="John Doe"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>title</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Team Lead | Team Leader"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -176,10 +196,10 @@ export default function EditMemberDialog({
 
               <FormField
                 control={form.control}
-                name="designation"
+                name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Designation</FormLabel>
+                    <FormLabel>Role</FormLabel>
                     <FormControl>
                       <Input
                         className="w-full"
@@ -216,7 +236,7 @@ export default function EditMemberDialog({
                 <div className="w-full sm:w-56">
                   <FormField
                     control={form.control}
-                    name="memberAt"
+                    name="subTeam"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Member Type</FormLabel>
@@ -229,9 +249,9 @@ export default function EditMemberDialog({
                               <SelectValue placeholder="Select member type" />
                             </SelectTrigger>
                             <SelectContent className="w-full">
-                              {Object.keys(memberAtLabels).map((label) => (
+                              {Object.keys(SubTeamRecord).map((label) => (
                                 <SelectItem value={label} key={label}>
-                                  {memberAtLabels[label as MemberAtKey]}
+                                  {SubTeamRecord[label as SubTeamKey]}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -249,7 +269,7 @@ export default function EditMemberDialog({
                 name="about"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>About</FormLabel>
+                    <FormLabel>About (optional)</FormLabel>
                     <FormControl>
                       <Textarea
                         className="w-full"
@@ -264,10 +284,10 @@ export default function EditMemberDialog({
 
               <FormField
                 control={form.control}
-                name="description"
+                name="bio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (optional)</FormLabel>
+                    <FormLabel>Bio (optional)</FormLabel>
                     <FormControl>
                       <Textarea
                         className="w-full"
@@ -356,7 +376,7 @@ export default function EditMemberDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="from"
+                    name="joined"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Start Date</FormLabel>
@@ -388,10 +408,10 @@ export default function EditMemberDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="until"
+                    name="left"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>End Date (optional)</FormLabel>
+                        <FormLabel>Left Date (optional)</FormLabel>
                         <FormControl>
                           <Input
                             type="date"

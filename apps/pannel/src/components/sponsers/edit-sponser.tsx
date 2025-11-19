@@ -51,9 +51,7 @@ export default function EditSponsorDialog({
   const [open, setOpen] = useState(false);
 
   // Fetch plans and competitions for dropdowns
-  const { data: plans } = useQuery(
-    trpc.team.getSponsorshipPlans.queryOptions()
-  );
+  const { data: plans } = useQuery(trpc.team.getPlans.queryOptions());
   const { data: competitions } = useQuery(
     trpc.competition.getCompetitions.queryOptions()
   );
@@ -81,13 +79,12 @@ export default function EditSponsorDialog({
   const form = useForm<FormValues>({
     resolver: zodResolver(UpdateSponsorSchema),
     defaultValues: {
-      sponsorId: sponsor.sponsor.sponsorId,
-      sponsorCompanyName: sponsor.sponsor.sponsorCompanyName,
-      sponsorCompanyDesctiption:
-        sponsor.sponsor.sponsorCompanyDesctiption || "",
-      sponsorCompanyWebsite: sponsor.sponsor.sponsorCompanyWebsite || "",
-      sponsorCompanylogo: sponsor.sponsor.sponsorCompanylogo,
-      sponsorshipPlan: sponsor.plan.id,
+      id: sponsor.sponsor.id,
+      name: sponsor.sponsor.name,
+      desctiption: sponsor.sponsor.desctiption || "",
+      website: sponsor.sponsor.website || "",
+      logo: sponsor.sponsor.logo,
+      plan: sponsor.plan.id,
       competitionId: sponsor.competition.id,
     },
   });
@@ -95,13 +92,12 @@ export default function EditSponsorDialog({
   // Reset form when sponsor prop changes
   useEffect(() => {
     form.reset({
-      sponsorId: sponsor.sponsor.sponsorId,
-      sponsorCompanyName: sponsor.sponsor.sponsorCompanyName,
-      sponsorCompanyDesctiption:
-        sponsor.sponsor.sponsorCompanyDesctiption || "",
-      sponsorCompanyWebsite: sponsor.sponsor.sponsorCompanyWebsite || "",
-      sponsorCompanylogo: sponsor.sponsor.sponsorCompanylogo,
-      sponsorshipPlan: sponsor.plan.id,
+      id: sponsor.sponsor.id,
+      name: sponsor.sponsor.name,
+      desctiption: sponsor.sponsor.desctiption || "",
+      website: sponsor.sponsor.website || "",
+      logo: sponsor.sponsor.logo,
+      plan: sponsor.plan.id,
       competitionId: sponsor.competition.id,
     });
   }, [sponsor, form]);
@@ -132,7 +128,7 @@ export default function EditSponsorDialog({
             >
               <FormField
                 control={form.control}
-                name="sponsorCompanyName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Name</FormLabel>
@@ -150,7 +146,7 @@ export default function EditSponsorDialog({
 
               <FormField
                 control={form.control}
-                name="sponsorCompanyDesctiption"
+                name="desctiption"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Description</FormLabel>
@@ -168,7 +164,7 @@ export default function EditSponsorDialog({
 
               <FormField
                 control={form.control}
-                name="sponsorCompanyWebsite"
+                name="website"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Website</FormLabel>
@@ -186,7 +182,7 @@ export default function EditSponsorDialog({
 
               <FormField
                 control={form.control}
-                name="sponsorCompanylogo"
+                name="logo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Logo URL</FormLabel>
@@ -204,7 +200,7 @@ export default function EditSponsorDialog({
 
               <FormField
                 control={form.control}
-                name="sponsorshipPlan"
+                name="plan"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Sponsorship Plan</FormLabel>
@@ -251,7 +247,7 @@ export default function EditSponsorDialog({
                             key={competition.id}
                             value={competition.id}
                           >
-                            {competition.competitionName}
+                            {competition.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

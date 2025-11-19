@@ -1,59 +1,47 @@
-CREATE TABLE "participated_competition" (
+CREATE TYPE "public"."region_key" AS ENUM('urc', 'arc', 'erc');--> statement-breakpoint
+CREATE TYPE "public"."sub_team" AS ENUM('LT', 'FA', 'MT', 'ET', 'ST', 'ScT', 'MgT', 'CT');--> statement-breakpoint
+CREATE TABLE "competitions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"competition_region_name" text NOT NULL,
-	"competition_name" text NOT NULL,
-	"competition_description" text NOT NULL,
-	"competition_location" text NOT NULL,
+	"region" "region_key" NOT NULL,
+	"name" text NOT NULL,
+	"description" text NOT NULL,
+	"location" text NOT NULL,
 	"rover_id" uuid NOT NULL,
-	"competition_result" text NOT NULL,
+	"result" text NOT NULL,
 	"featured" boolean DEFAULT false,
 	"image" text NOT NULL,
-	"color" varchar NOT NULL,
-	"bg_color" varchar NOT NULL,
+	"icon_color" varchar NOT NULL,
+	"icon_bg" varchar NOT NULL,
 	"icon" varchar NOT NULL,
-	"competition_highlight" text[] DEFAULT ARRAY[]::text[] NOT NULL,
+	"highlight" text[] DEFAULT ARRAY[]::text[] NOT NULL,
 	"participation_year" timestamp with time zone NOT NULL,
+	"score" varchar,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "participated_competition_id_unique" UNIQUE("id")
+	CONSTRAINT "competitions_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
 CREATE TABLE "rover" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"image" text NOT NULL,
 	"name" varchar(100) NOT NULL,
-	"tag" varchar(100) NOT NULL,
+	"status" varchar NOT NULL,
 	"description" text NOT NULL,
-	"weight" text NOT NULL,
-	"power" text NOT NULL,
-	"arm" text NOT NULL,
-	"dimentions" text NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"from" timestamp DEFAULT now() NOT NULL,
-	"until" timestamp,
-	"key_achievements" text[] DEFAULT ARRAY[]::text[] NOT NULL,
+	"spec" jsonb NOT NULL,
+	"year" timestamp DEFAULT now() NOT NULL,
+	"ended" timestamp,
+	"achievements" text[] DEFAULT ARRAY[]::text[] NOT NULL,
 	"features" text[] DEFAULT ARRAY[]::text[] NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "rover_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
-CREATE TABLE "sponsor" (
-	"sponsor_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"sponsor_company_name" varchar NOT NULL,
-	"sponsor_company_desctiption" text NOT NULL,
-	"sponsor_company_website" text NOT NULL,
-	"sponsor_company_logo" text NOT NULL,
-	"sponsorship_plan" uuid NOT NULL,
-	"competition_id" uuid,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "sponsor_sponsor_id_unique" UNIQUE("sponsor_id")
-);
---> statement-breakpoint
-CREATE TABLE "sponsorship_plans" (
+CREATE TABLE "plans" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"subtitle" varchar(100),
 	"price" integer NOT NULL,
 	"price_label" varchar(100),
-	"icon_type" varchar(50) NOT NULL,
+	"icon" varchar(50) NOT NULL,
 	"icon_color" varchar(50) NOT NULL,
 	"icon_bg_color" varchar(50) NOT NULL,
 	"border_color" varchar(50),
@@ -63,33 +51,46 @@ CREATE TABLE "sponsorship_plans" (
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "sponsorship_plans_id_unique" UNIQUE("id")
+	CONSTRAINT "plans_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
-CREATE TABLE "team_member_competitions" (
+CREATE TABLE "sponsors" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar NOT NULL,
+	"desctiption" text NOT NULL,
+	"website" text NOT NULL,
+	"logo" text NOT NULL,
+	"plan" uuid NOT NULL,
+	"competition_id" uuid NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "sponsors_id_unique" UNIQUE("id")
+);
+--> statement-breakpoint
+CREATE TABLE "competitions_members" (
 	"team_member_id" uuid NOT NULL,
 	"competition_id" uuid NOT NULL,
 	"role" varchar(100),
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "team_members" (
+CREATE TABLE "members" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"image" text NOT NULL,
 	"name" varchar(100) NOT NULL,
-	"designation" varchar NOT NULL,
+	"role" varchar NOT NULL,
 	"department" varchar NOT NULL,
-	"member_at" text NOT NULL,
-	"description" text,
+	"image" text NOT NULL,
+	"subTeam" "sub_team" NOT NULL,
+	"bio" text,
+	"title" text,
 	"email" varchar,
 	"phone" varchar,
 	"linkedin" varchar,
 	"github" varchar,
-	"about" varchar NOT NULL,
+	"about" varchar,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"from" timestamp DEFAULT now() NOT NULL,
-	"until" timestamp,
-	CONSTRAINT "team_members_id_unique" UNIQUE("id")
+	"joined" timestamp,
+	"left" timestamp,
+	CONSTRAINT "members_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
 CREATE TABLE "account" (
@@ -142,11 +143,11 @@ CREATE TABLE "verificationToken" (
 	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "participated_competition" ADD CONSTRAINT "participated_competition_rover_id_rover_id_fk" FOREIGN KEY ("rover_id") REFERENCES "public"."rover"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "sponsor" ADD CONSTRAINT "sponsor_sponsorship_plan_sponsorship_plans_id_fk" FOREIGN KEY ("sponsorship_plan") REFERENCES "public"."sponsorship_plans"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "sponsor" ADD CONSTRAINT "sponsor_competition_id_participated_competition_id_fk" FOREIGN KEY ("competition_id") REFERENCES "public"."participated_competition"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "team_member_competitions" ADD CONSTRAINT "team_member_competitions_team_member_id_team_members_id_fk" FOREIGN KEY ("team_member_id") REFERENCES "public"."team_members"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "team_member_competitions" ADD CONSTRAINT "team_member_competitions_competition_id_participated_competition_id_fk" FOREIGN KEY ("competition_id") REFERENCES "public"."participated_competition"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "competitions" ADD CONSTRAINT "competitions_rover_id_rover_id_fk" FOREIGN KEY ("rover_id") REFERENCES "public"."rover"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sponsors" ADD CONSTRAINT "sponsors_plan_plans_id_fk" FOREIGN KEY ("plan") REFERENCES "public"."plans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sponsors" ADD CONSTRAINT "sponsors_competition_id_competitions_id_fk" FOREIGN KEY ("competition_id") REFERENCES "public"."competitions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "competitions_members" ADD CONSTRAINT "competitions_members_team_member_id_members_id_fk" FOREIGN KEY ("team_member_id") REFERENCES "public"."members"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "competitions_members" ADD CONSTRAINT "competitions_members_competition_id_competitions_id_fk" FOREIGN KEY ("competition_id") REFERENCES "public"."competitions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "authenticator" ADD CONSTRAINT "authenticator_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;

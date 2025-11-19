@@ -1,11 +1,7 @@
 "use client";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  CompetitionsSelect,
-  Sponsors,
-  SponsorshipPlans,
-} from "@workspace/db/schema";
+import { CompetitionsSelect, Sponsors, Plans } from "@workspace/db/schema";
 import { Button } from "@workspace/ui/components/button";
 import {
   Table,
@@ -22,7 +18,7 @@ import EditSponserDialog from "./edit-sponser";
 
 export interface SponsersWithRelation {
   sponsor: Sponsors;
-  plan: SponsorshipPlans;
+  plan: Plans;
   competition: CompetitionsSelect;
 }
 
@@ -61,12 +57,8 @@ export default function SponserTable({
 
   const deleteSponsorCallback = useCallback(
     (sponsor: Sponsors) => {
-      if (
-        confirm(
-          `Are you sure that you want to delete ${sponsor.sponsorCompanyName}?`
-        )
-      ) {
-        deleteSponsor.mutate({ sponsorId: sponsor.sponsorId });
+      if (confirm(`Are you sure that you want to delete ${sponsor.name}?`)) {
+        deleteSponsor.mutate({ id: sponsor.id });
       }
     },
     [deleteSponsor]
@@ -100,21 +92,21 @@ export default function SponserTable({
             </TableRow>
           ) : (
             sponsers.map((item) => (
-              <TableRow key={item.sponsor.sponsorId}>
+              <TableRow key={item.sponsor.id}>
                 <TableCell>
                   <img
-                    src={item.sponsor.sponsorCompanylogo}
-                    alt={item.sponsor.sponsorCompanyName}
+                    src={item.sponsor.logo}
+                    alt={item.sponsor.name}
                     className="w-10 h-10 rounded object-cover"
                   />
                 </TableCell>
                 <TableCell className="font-medium">
-                  {item.sponsor.sponsorCompanyName}
+                  {item.sponsor.name}
                 </TableCell>
                 <TableCell>
-                  {item.sponsor.sponsorCompanyWebsite ? (
+                  {item.sponsor.website ? (
                     <a
-                      href={item.sponsor.sponsorCompanyWebsite}
+                      href={item.sponsor.website}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
@@ -132,7 +124,7 @@ export default function SponserTable({
                 </TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700">
-                    {item.competition.competitionName}
+                    {item.competition.name}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">

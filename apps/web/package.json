@@ -19,6 +19,8 @@
     "@vercel/analytics": "^1.5.0",
     "@workspace/api": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "@workspace/db": "workspace:*",
+    "@workspace/types": "workspace:*",
     "geist": "^1.5.1",
     "lucide-react": "^0.475.0",
     "next": "^15.4.5",

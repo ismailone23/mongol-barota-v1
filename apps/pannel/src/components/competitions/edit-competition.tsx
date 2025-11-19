@@ -1,6 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateCompetitionSchema, competitionRegions } from "@workspace/types";
+import {
+  UpdateCompetitionSchema,
+  RegionRecord,
+  RegionKey,
+} from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -17,6 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@workspace/ui/components/form";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -36,10 +41,13 @@ import { useCallback, useEffect, useState } from "react";
 import { CompetitionsInsert } from "@workspace/db/schema";
 import { Plus, X } from "lucide-react";
 import { competitionIcons, tailwindColors } from "@/constants/route";
+
 type FormValues = z.infer<typeof UpdateCompetitionSchema>;
 
 interface EditCompetitionDialogProps {
-  competition: CompetitionsInsert;
+  competition: CompetitionsInsert & {
+    teamMemberCompetitions?: Array<{ teamMemberId: string }>;
+  };
   trigger?: React.ReactNode;
   refetch: any;
 }
@@ -52,9 +60,21 @@ export default function EditCompetitionDialog({
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
 
-  // Fetch rovers for the select dropdown
   const { data: rovers, isLoading: roversLoading } = useQuery(
     trpc.competition.getRovers.queryOptions()
+  );
+
+  const { data: teamMembers, isLoading: teamMembersLoading } = useQuery(
+    trpc.team.getMembers.queryOptions()
+  );
+
+  const { data: competitionWithMembers } = useQuery(
+    trpc.competition.getCompetitionWithMembers.queryOptions(
+      {
+        id: competition.id!,
+      },
+      { enabled: !!competition }
+    )
   );
 
   const updateCompetition = useMutation(
@@ -81,39 +101,50 @@ export default function EditCompetitionDialog({
     resolver: zodResolver(UpdateCompetitionSchema),
     defaultValues: {
       id: competition.id,
-      competitionRegionName: competition.competitionRegionName,
-      competitionName: competition.competitionName,
-      competitionDescription: competition.competitionDescription,
+      region: competition.region,
+      name: competition.name,
+      description: competition.description,
       location: competition.location,
       roverId: competition.roverId,
-      competitionResult: competition.competitionResult,
+      result: competition.result,
       featured: competition.featured ?? false,
       image: competition.image,
-      color: competition.color,
-      bgColor: competition.bgColor,
+      iconColor: competition.iconColor,
+      iconBg: competition.iconBg,
       icon: competition.icon,
-      participationYear: competition.participationYear,
+      highlights: competition.highlights,
+      year: competition.year,
+      teamMemberIds: [], // Will be set when data loads
     },
   });
 
-  // Reset form when competition prop changes
+  // NEW: Update form when competition with members data loads
   useEffect(() => {
-    form.reset({
-      id: competition.id,
-      competitionRegionName: competition.competitionRegionName,
-      competitionName: competition.competitionName,
-      competitionDescription: competition.competitionDescription,
-      location: competition.location,
-      roverId: competition.roverId,
-      competitionResult: competition.competitionResult,
-      featured: competition.featured ?? false,
-      image: competition.image,
-      color: competition.color,
-      bgColor: competition.bgColor,
-      icon: competition.icon,
-      participationYear: competition.participationYear,
-    });
-  }, [competition, form]);
+    if (competitionWithMembers) {
+      const memberIds =
+        competitionWithMembers.competitionMembers?.map(
+          (tc) => tc.teamMember.id
+        ) || [];
+
+      form.reset({
+        id: competition.id,
+        region: competition.region,
+        name: competition.name,
+        description: competition.description,
+        location: competition.location,
+        roverId: competition.roverId,
+        result: competition.result,
+        featured: competition.featured ?? false,
+        image: competition.image,
+        iconColor: competition.iconColor,
+        iconBg: competition.iconBg,
+        highlights: competition.highlights,
+        icon: competition.icon,
+        year: competition.year,
+        teamMemberIds: memberIds,
+      });
+    }
+  }, [competitionWithMembers, competition, form]);
 
   const onSubmit = useCallback(
     (values: FormValues) => {
@@ -141,7 +172,7 @@ export default function EditCompetitionDialog({
             >
               <FormField
                 control={form.control}
-                name="competitionRegionName"
+                name="region"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Competition Region</FormLabel>
@@ -154,9 +185,9 @@ export default function EditCompetitionDialog({
                           <SelectValue placeholder="Select competition region" />
                         </SelectTrigger>
                         <SelectContent className="w-full">
-                          {competitionRegions.map((region) => (
+                          {Object.keys(RegionRecord).map((region) => (
                             <SelectItem value={region} key={region}>
-                              {region}
+                              {RegionRecord[region as RegionKey]}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -169,7 +200,7 @@ export default function EditCompetitionDialog({
 
               <FormField
                 control={form.control}
-                name="competitionName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Competition Name</FormLabel>
@@ -187,7 +218,7 @@ export default function EditCompetitionDialog({
 
               <FormField
                 control={form.control}
-                name="competitionDescription"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Description</FormLabel>
@@ -227,7 +258,7 @@ export default function EditCompetitionDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="participationYear"
+                    name="year"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Participation Year</FormLabel>
@@ -286,9 +317,73 @@ export default function EditCompetitionDialog({
                 )}
               />
 
+              {/* NEW: Team Members Multi-Select */}
               <FormField
                 control={form.control}
-                name="competitionResult"
+                name="teamMemberIds"
+                render={({ field }) => {
+                  const selectedIds = field.value || [];
+
+                  const toggleMember = (memberId: string) => {
+                    const newIds = selectedIds.includes(memberId)
+                      ? selectedIds.filter((id) => id !== memberId)
+                      : [...selectedIds, memberId];
+                    field.onChange(newIds);
+                  };
+
+                  return (
+                    <FormItem>
+                      <FormLabel>Team Members</FormLabel>
+                      <FormDescription>
+                        Select team members who participated in this competition
+                      </FormDescription>
+                      <FormControl>
+                        <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
+                          {teamMembersLoading ? (
+                            <p className="text-sm text-muted-foreground">
+                              Loading team members...
+                            </p>
+                          ) : !teamMembers || teamMembers.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">
+                              No team members available
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {teamMembers.map((member) => (
+                                <div
+                                  key={member.id}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <Checkbox
+                                    checked={selectedIds.includes(member.id)}
+                                    onCheckedChange={() =>
+                                      toggleMember(member.id)
+                                    }
+                                  />
+                                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                                    {member.name} - {member.role}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      {selectedIds.length > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          {selectedIds.length} member
+                          {selectedIds.length !== 1 ? "s" : ""} selected
+                        </p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+
+              <FormField
+                control={form.control}
+                name="result"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Competition Result</FormLabel>
@@ -321,6 +416,7 @@ export default function EditCompetitionDialog({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="icon"
@@ -338,7 +434,8 @@ export default function EditCompetitionDialog({
                         <SelectContent className="w-full">
                           {competitionIcons.map(({ icon: Icon, value }, i) => (
                             <SelectItem value={value} key={i}>
-                              <Icon className="w-4 h-4" /> {value}
+                              <Icon className="w-4 h-4" />
+                              {value}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -353,7 +450,7 @@ export default function EditCompetitionDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="color"
+                    name="iconColor"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Color</FormLabel>
@@ -383,7 +480,7 @@ export default function EditCompetitionDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="bgColor"
+                    name="iconBg"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Background Color</FormLabel>

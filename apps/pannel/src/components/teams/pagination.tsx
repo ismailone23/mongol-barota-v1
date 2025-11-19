@@ -1,4 +1,4 @@
-import { TeamMembersSelect } from "@workspace/db/schema";
+import { MemberSelect } from "@workspace/db/schema";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
@@ -13,7 +13,7 @@ export default function Pagination({
   currentPage: number;
   itemsPerPage: number;
   hasNextPage: boolean;
-  members: TeamMembersSelect[];
+  members: MemberSelect[];
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const loadedPages = Math.ceil(members.length / itemsPerPage);

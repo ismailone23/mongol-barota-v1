@@ -28,27 +28,13 @@ import {
   Wrench,
   Target,
   Award,
+  Weight,
+  Ratio,
 } from "lucide-react";
+import { RoversSelect } from "@workspace/db/schema";
 
 interface RoverModalProps {
-  rover: {
-    id: string;
-    name: string;
-    year: string;
-    status: string;
-    description: string;
-    image: string;
-    achievements: string[];
-    specs: {
-      weight: string;
-      dimensions: string;
-      power: string;
-      communication: string;
-      autonomy: string;
-      arm: string;
-    };
-    features: string[];
-  };
+  rover: RoversSelect;
   children: React.ReactNode;
 }
 
@@ -96,7 +82,7 @@ export function RoverModal({ rover, children }: RoverModalProps) {
             <div className="absolute top-4 left-4">
               <Badge variant="secondary" className="bg-background/90">
                 <Calendar className="w-3 h-3 mr-1" />
-                {rover.year}
+                {new Date(rover.year).getFullYear()}
               </Badge>
             </div>
           </div>
@@ -134,19 +120,53 @@ export function RoverModal({ rover, children }: RoverModalProps) {
             <TabsContent value="specifications" className="space-y-4">
               <h4 className="font-semibold">Technical Specifications</h4>
               <div className="grid md:grid-cols-2 gap-4">
-                {Object.entries(rover.specs).map(([key, value]) => (
-                  <Card key={key}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Cpu className="w-4 h-4 text-primary" />
-                        <span className="font-medium capitalize">
-                          {key.replace(/([A-Z])/g, " $1")}
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground">{value}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Cpu className="w-4 h-4 text-primary" />
+                      <span className="font-medium capitalize"></span>
+                    </div>
+                    <p className="text-muted-foreground">{rover.spec.arm}</p>
+                  </CardContent>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Cpu className="w-4 h-4 text-primary" />
+                      <span className="font-medium capitalize"></span>
+                    </div>
+                    <p className="text-muted-foreground">
+                      {rover.spec.autonomy}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Weight className="w-4 h-4 text-primary" />
+                      <span className="font-medium capitalize"></span>
+                    </div>
+                    <p className="text-muted-foreground">{rover.spec.weight}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Ratio className="w-4 h-4 text-primary" />
+                      <span className="font-medium capitalize"></span>
+                    </div>
+                    <p className="text-muted-foreground">
+                      {rover.spec.dimensions}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span className="font-medium capitalize"></span>
+                    </div>
+                    <p className="text-muted-foreground">{rover.spec.power}</p>
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 

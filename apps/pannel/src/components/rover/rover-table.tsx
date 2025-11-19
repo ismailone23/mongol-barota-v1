@@ -1,7 +1,7 @@
 "use client";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Rovers } from "@workspace/db/schema";
+import { RoversSelect } from "@workspace/db/schema";
 import { Button } from "@workspace/ui/components/button";
 import {
   Table,
@@ -23,7 +23,7 @@ export default function RoverTable({
 }: {
   isLoading: boolean;
   refetch: any;
-  rovers: Rovers[] | undefined;
+  rovers: RoversSelect[] | undefined;
 }) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -50,7 +50,7 @@ export default function RoverTable({
   );
 
   const deleteRoverCallback = useCallback(
-    (rover: Rovers) => {
+    (rover: RoversSelect) => {
       if (confirm(`Are you sure that you want to delete ${rover.name}?`)) {
         deleteRover.mutate({ id: rover.id });
       }
@@ -65,12 +65,14 @@ export default function RoverTable({
           <TableRow>
             <TableHead className="w-20">Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Tag</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Features</TableHead>
-            <TableHead>Key Achievements</TableHead>
+            <TableHead>Achievements</TableHead>
             <TableHead>Weight</TableHead>
             <TableHead>Power</TableHead>
             <TableHead>Dimensions</TableHead>
+            <TableHead>Arm</TableHead>
+            <TableHead>Autonomy</TableHead>
             <TableHead>Active Period</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -99,22 +101,7 @@ export default function RoverTable({
                   />
                 </TableCell>
                 <TableCell className="font-medium">{rover.name}</TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {rover.tag && rover.tag.length > 0 ? (
-                      rover.tag.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
-                        >
-                          {tag}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 text-xs">No tags</span>
-                    )}
-                  </div>
-                </TableCell>
+                <TableCell>{rover.status}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {rover.features && rover.features.length > 0 ? (
@@ -133,14 +120,13 @@ export default function RoverTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {rover.keyAchievements &&
-                    rover.keyAchievements.length > 0 ? (
-                      rover.keyAchievements.map((keyAchievements, index) => (
+                    {rover.achievements && rover.achievements.length > 0 ? (
+                      rover.achievements.map((achievements, index) => (
                         <span
                           key={index}
                           className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
                         >
-                          {keyAchievements}
+                          {achievements}
                         </span>
                       ))
                     ) : (
@@ -150,18 +136,16 @@ export default function RoverTable({
                     )}
                   </div>
                 </TableCell>
-                <TableCell>{rover.weight}</TableCell>
-                <TableCell>{rover.power}</TableCell>
-                <TableCell>{rover.dimentions}</TableCell>
+                <TableCell>{rover.spec.weight}</TableCell>
+                <TableCell>{rover.spec.power}</TableCell>
+                <TableCell>{rover.spec.dimensions}</TableCell>
+                <TableCell>{rover.spec.arm}</TableCell>
+                <TableCell>{rover.spec.autonomy}</TableCell>
                 <TableCell>
                   <div className="text-sm flex ">
-                    <div>{new Date(rover.from).getFullYear()}</div>-
-                    {rover.until ? (
-                      <div className="text-gray-500">
-                        {new Date(rover.until).getFullYear()}
-                      </div>
-                    ) : (
-                      <p>Present</p>
+                    <div>{new Date(rover.year).getFullYear()}</div>-
+                    {rover.ended && (
+                      <div>{new Date(rover.ended).getFullYear()}</div>
                     )}
                   </div>
                 </TableCell>

@@ -1,19 +1,30 @@
-import { pgTable } from "drizzle-orm/pg-core";
-import { participatedCompetitions } from "./competitions";
+import { pgEnum, pgTable } from "drizzle-orm/pg-core";
+import { competitions } from "./competitions";
 import { relations } from "drizzle-orm";
 
-export const teamMembers = pgTable("team_members", (t) => ({
-  id: t.uuid("id").notNull().defaultRandom().primaryKey().unique(), // Changed to UUID
-  image: t.text("image").notNull(),
+export const subTeamKeys = [
+  "LT",
+  "FA",
+  "MT",
+  "ET",
+  "ST",
+  "ScT",
+  "MgT",
+  "CT",
+] as const;
+
+export const subTeamEnum = pgEnum("sub_team", subTeamKeys);
+export type SubTeam = typeof subTeamKeys;
+
+export const members = pgTable("members", (t) => ({
+  id: t.uuid("id").notNull().defaultRandom().primaryKey().unique(),
   name: t.varchar("name", { length: 100 }).notNull(),
-  designation: t.varchar("designation").notNull(),
+  role: t.varchar("role").notNull(),
   department: t.varchar("department").notNull(),
-  memberAt: t
-    .text("member_at", {
-      enum: ["LT", "FA", "MT", "ET", "ST", "ScT", "MgT", "CT"],
-    })
-    .notNull(),
-  description: t.text("description"),
+  image: t.text("image").notNull(),
+  subTeam: subTeamEnum().notNull(),
+  bio: t.text("bio"),
+  title: t.text("title"),
   email: t.varchar("email"),
   phone: t.varchar("phone"),
   linkedin: t.varchar("linkedin"),
@@ -23,27 +34,26 @@ export const teamMembers = pgTable("team_members", (t) => ({
     .timestamp("created_at", { withTimezone: true, mode: "date" })
     .defaultNow()
     .notNull(),
-  from: t.timestamp("from", { mode: "date" }).notNull(),
-  until: t.timestamp("until", { mode: "date" }),
+  joined: t.timestamp("joined", { mode: "date" }),
+  left: t.timestamp("left", { mode: "date" }),
 }));
 
-export type TeamMembersInsert = typeof teamMembers.$inferInsert;
-export type TeamMembersSelect = typeof teamMembers.$inferSelect;
+export type MemberInsert = typeof members.$inferInsert;
+export type MemberSelect = typeof members.$inferSelect;
 
-// ============= JUNCTION TABLE: Team Members <-> Competitions =============
-// This is needed for many-to-many relationship
-export const teamMemberCompetitions = pgTable(
-  "team_member_competitions",
+// will be used when a new competition will be added
+export const competitionMembers = pgTable(
+  "competitions_members",
   (t) => ({
     teamMemberId: t
       .uuid("team_member_id")
       .notNull()
-      .references(() => teamMembers.id, { onDelete: "cascade" }),
+      .references(() => members.id, { onDelete: "cascade" }),
     competitionId: t
       .uuid("competition_id")
       .notNull()
-      .references(() => participatedCompetitions.id, { onDelete: "cascade" }),
-    role: t.varchar("role", { length: 100 }), // Optional: their role in this competition
+      .references(() => competitions.id, { onDelete: "cascade" }),
+    role: t.varchar("role", { length: 100 }),
     createdAt: t
       .timestamp("created_at", { withTimezone: true, mode: "date" })
       .defaultNow()
@@ -51,27 +61,27 @@ export const teamMemberCompetitions = pgTable(
   }),
   (table) => ({
     pk: {
-      name: "team_member_competitions_pk",
+      name: "competitions_members_pk",
       columns: [table.teamMemberId, table.competitionId],
     },
   })
 );
 
 // Relations
-export const teamMemberRelations = relations(teamMembers, ({ many }) => ({
-  teamMemberCompetitions: many(teamMemberCompetitions),
+export const teamMemberRelations = relations(members, ({ many }) => ({
+  competitionMembers: many(competitionMembers),
 }));
 
-export const teamMemberCompetitionsRelations = relations(
-  teamMemberCompetitions,
+export const competitionMembersRelations = relations(
+  competitionMembers,
   ({ one }) => ({
-    teamMember: one(teamMembers, {
-      fields: [teamMemberCompetitions.teamMemberId],
-      references: [teamMembers.id],
+    teamMember: one(members, {
+      fields: [competitionMembers.teamMemberId],
+      references: [members.id],
     }),
-    competition: one(participatedCompetitions, {
-      fields: [teamMemberCompetitions.competitionId],
-      references: [participatedCompetitions.id],
+    competition: one(competitions, {
+      fields: [competitionMembers.competitionId],
+      references: [competitions.id],
     }),
   })
 );

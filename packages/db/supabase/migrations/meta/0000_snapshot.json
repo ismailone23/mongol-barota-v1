@@ -1,11 +1,11 @@
 {
-  "id": "51e4d49f-2705-4c43-8162-8177b6070dbc",
-  "prevId": "0dc8735d-2346-4cf9-9518-bf36e2b71038",
+  "id": "3d8cca7e-e9b5-4ad3-8f0b-fb38325b2087",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.participated_competition": {
-      "name": "participated_competition",
+    "public.competitions": {
+      "name": "competitions",
       "schema": "",
       "columns": {
         "id": {
@@ -15,26 +15,27 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "competition_region_name": {
-          "name": "competition_region_name",
+        "region": {
+          "name": "region",
+          "type": "region_key",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "competition_name": {
-          "name": "competition_name",
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "competition_description": {
-          "name": "competition_description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "competition_location": {
-          "name": "competition_location",
+        "location": {
+          "name": "location",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -45,8 +46,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "competition_result": {
-          "name": "competition_result",
+        "result": {
+          "name": "result",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -64,14 +65,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "color": {
-          "name": "color",
+        "icon_color": {
+          "name": "icon_color",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "bg_color": {
-          "name": "bg_color",
+        "icon_bg": {
+          "name": "icon_bg",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
@@ -82,8 +83,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "competition_highlight": {
-          "name": "competition_highlight",
+        "highlight": {
+          "name": "highlight",
           "type": "text[]",
           "primaryKey": false,
           "notNull": true,
@@ -95,6 +96,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "score": {
+          "name": "score",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -105,9 +112,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "participated_competition_rover_id_rover_id_fk": {
-          "name": "participated_competition_rover_id_rover_id_fk",
-          "tableFrom": "participated_competition",
+        "competitions_rover_id_rover_id_fk": {
+          "name": "competitions_rover_id_rover_id_fk",
+          "tableFrom": "competitions",
           "tableTo": "rover",
           "columnsFrom": [
             "rover_id"
@@ -121,8 +128,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "participated_competition_id_unique": {
-          "name": "participated_competition_id_unique",
+        "competitions_id_unique": {
+          "name": "competitions_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
@@ -156,12 +163,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "tag": {
-          "name": "tag",
-          "type": "text[]",
+        "status": {
+          "name": "status",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "default": "ARRAY[]::text[]"
+          "notNull": true
         },
         "description": {
           "name": "description",
@@ -169,52 +175,27 @@
           "primaryKey": false,
           "notNull": true
         },
-        "weight": {
-          "name": "weight",
-          "type": "text",
+        "spec": {
+          "name": "spec",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
-        "power": {
-          "name": "power",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "arm": {
-          "name": "arm",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dimentions": {
-          "name": "dimentions",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "from": {
-          "name": "from",
+        "year": {
+          "name": "year",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "until": {
-          "name": "until",
+        "ended": {
+          "name": "ended",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
-        "key_achievements": {
-          "name": "key_achievements",
+        "achievements": {
+          "name": "achievements",
           "type": "text[]",
           "primaryKey": false,
           "notNull": true,
@@ -226,6 +207,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "ARRAY[]::text[]"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -244,106 +232,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sponsor": {
-      "name": "sponsor",
-      "schema": "",
-      "columns": {
-        "sponsor_id": {
-          "name": "sponsor_id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "sponsor_company_name": {
-          "name": "sponsor_company_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sponsor_company_desctiption": {
-          "name": "sponsor_company_desctiption",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sponsor_company_website": {
-          "name": "sponsor_company_website",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sponsor_company_logo": {
-          "name": "sponsor_company_logo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sponsorship_plan": {
-          "name": "sponsorship_plan",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "competition_id": {
-          "name": "competition_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "sponsor_sponsorship_plan_sponsorship_plans_id_fk": {
-          "name": "sponsor_sponsorship_plan_sponsorship_plans_id_fk",
-          "tableFrom": "sponsor",
-          "tableTo": "sponsorship_plans",
-          "columnsFrom": [
-            "sponsorship_plan"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "sponsor_competition_id_participated_competition_id_fk": {
-          "name": "sponsor_competition_id_participated_competition_id_fk",
-          "tableFrom": "sponsor",
-          "tableTo": "participated_competition",
-          "columnsFrom": [
-            "competition_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "sponsor_sponsor_id_unique": {
-          "name": "sponsor_sponsor_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "sponsor_id"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.sponsorship_plans": {
-      "name": "sponsorship_plans",
+    "public.plans": {
+      "name": "plans",
       "schema": "",
       "columns": {
         "id": {
@@ -377,8 +267,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "icon_type": {
-          "name": "icon_type",
+        "icon": {
+          "name": "icon",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
@@ -427,7 +317,7 @@
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -448,8 +338,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "sponsorship_plans_id_unique": {
-          "name": "sponsorship_plans_id_unique",
+        "plans_id_unique": {
+          "name": "plans_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
@@ -460,8 +350,106 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.team_member_competitions": {
-      "name": "team_member_competitions",
+    "public.sponsors": {
+      "name": "sponsors",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "desctiption": {
+          "name": "desctiption",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "website": {
+          "name": "website",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "logo": {
+          "name": "logo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan": {
+          "name": "plan",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competition_id": {
+          "name": "competition_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sponsors_plan_plans_id_fk": {
+          "name": "sponsors_plan_plans_id_fk",
+          "tableFrom": "sponsors",
+          "tableTo": "plans",
+          "columnsFrom": [
+            "plan"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "sponsors_competition_id_competitions_id_fk": {
+          "name": "sponsors_competition_id_competitions_id_fk",
+          "tableFrom": "sponsors",
+          "tableTo": "competitions",
+          "columnsFrom": [
+            "competition_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sponsors_id_unique": {
+          "name": "sponsors_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competitions_members": {
+      "name": "competitions_members",
       "schema": "",
       "columns": {
         "team_member_id": {
@@ -492,10 +480,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "team_member_competitions_team_member_id_team_members_id_fk": {
-          "name": "team_member_competitions_team_member_id_team_members_id_fk",
-          "tableFrom": "team_member_competitions",
-          "tableTo": "team_members",
+        "competitions_members_team_member_id_members_id_fk": {
+          "name": "competitions_members_team_member_id_members_id_fk",
+          "tableFrom": "competitions_members",
+          "tableTo": "members",
           "columnsFrom": [
             "team_member_id"
           ],
@@ -505,10 +493,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "team_member_competitions_competition_id_participated_competition_id_fk": {
-          "name": "team_member_competitions_competition_id_participated_competition_id_fk",
-          "tableFrom": "team_member_competitions",
-          "tableTo": "participated_competition",
+        "competitions_members_competition_id_competitions_id_fk": {
+          "name": "competitions_members_competition_id_competitions_id_fk",
+          "tableFrom": "competitions_members",
+          "tableTo": "competitions",
           "columnsFrom": [
             "competition_id"
           ],
@@ -525,8 +513,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.team_members": {
-      "name": "team_members",
+    "public.members": {
+      "name": "members",
       "schema": "",
       "columns": {
         "id": {
@@ -536,20 +524,14 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },
-        "designation": {
-          "name": "designation",
+        "role": {
+          "name": "role",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
@@ -560,14 +542,27 @@
           "primaryKey": false,
           "notNull": true
         },
-        "member_at": {
-          "name": "member_at",
+        "image": {
+          "name": "image",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "description": {
-          "name": "description",
+        "subTeam": {
+          "name": "subTeam",
+          "type": "sub_team",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -609,14 +604,14 @@
           "notNull": true,
           "default": "now()"
         },
-        "from": {
-          "name": "from",
+        "joined": {
+          "name": "joined",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "until": {
-          "name": "until",
+        "left": {
+          "name": "left",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -626,8 +621,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "team_members_id_unique": {
-          "name": "team_members_id_unique",
+        "members_id_unique": {
+          "name": "members_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "id"
@@ -961,7 +956,31 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.region_key": {
+      "name": "region_key",
+      "schema": "public",
+      "values": [
+        "urc",
+        "arc",
+        "erc"
+      ]
+    },
+    "public.sub_team": {
+      "name": "sub_team",
+      "schema": "public",
+      "values": [
+        "LT",
+        "FA",
+        "MT",
+        "ET",
+        "ST",
+        "ScT",
+        "MgT",
+        "CT"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

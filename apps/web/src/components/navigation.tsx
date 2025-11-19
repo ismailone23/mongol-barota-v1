@@ -51,8 +51,8 @@ export function Navigation() {
     <nav
       className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
         isScrolled
-          ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-lg"
-          : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+          ? "bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 shadow-lg"
+          : "bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
       }`}
     >
       <div className="container mx-auto px-4">
@@ -106,7 +106,7 @@ export function Navigation() {
                 >
                   <span className="relative z-10">{item.name}</span>
                   {!isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-secondary/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                   )}
                 </Link>
               );

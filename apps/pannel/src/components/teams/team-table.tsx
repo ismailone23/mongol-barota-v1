@@ -1,8 +1,8 @@
 "use client";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { TeamMembersSelect } from "@workspace/db/schema";
-import { memberAtLabels } from "@workspace/types";
+import { MemberSelect } from "@workspace/db/schema";
+import { SubTeamRecord } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
   Table,
@@ -24,7 +24,7 @@ export default function TeamTable({
 }: {
   isLoading: boolean;
   refetch: any;
-  paginatedMembers: TeamMembersSelect[];
+  paginatedMembers: MemberSelect[];
 }) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -38,7 +38,7 @@ export default function TeamTable({
       onSuccess: (_data, _vars, ctx) => {
         toast.success("Member Deleted", { id: ctx.toastId });
         void queryClient.invalidateQueries(
-          trpc.team.getAllMembers.queryOptions({})
+          trpc.team.getPaginatedMembers.queryOptions({})
         );
       },
       onError: (error, _vars, ctx) => {
@@ -49,7 +49,7 @@ export default function TeamTable({
       },
     })
   );
-  const deleteMemberCallback = useCallback((member: TeamMembersSelect) => {
+  const deleteMemberCallback = useCallback((member: MemberSelect) => {
     if (confirm(`Are you sure that you want to delete ${member.name} ?`)) {
       deleteMember.mutate({ id: member.id });
     }
@@ -91,12 +91,15 @@ export default function TeamTable({
                     className="w-10 h-10 rounded-full"
                   />
                 </TableCell>
-                <TableCell className="font-medium">{member.name}</TableCell>
-                <TableCell>{member.designation}</TableCell>
+                <TableCell className="font-medium">
+                  {member.name}
+                  {member.title}
+                </TableCell>
+                <TableCell>{member.role}</TableCell>
                 <TableCell>{member.department}</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                    {memberAtLabels[member.memberAt]}
+                    {SubTeamRecord[member.subTeam]}
                   </span>
                 </TableCell>
                 <TableCell>

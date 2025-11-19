@@ -1,7 +1,7 @@
 "use client";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { SponsorshipPlans } from "@workspace/db/schema";
+import { PlansSelect } from "@workspace/db/schema";
 import { Button } from "@workspace/ui/components/button";
 import {
   Table,
@@ -15,31 +15,29 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import React, { useCallback } from "react";
 import { toast } from "sonner";
-import EditSponsorshipPlanDialog from "./edit-plan";
+import EditPlanDialog from "./edit-plan";
 
-export default function SponsorshipPlanTable({
+export default function PlanTable({
   plans,
   isLoading,
   refetch,
 }: {
   isLoading: boolean;
   refetch: any;
-  plans: SponsorshipPlans[] | undefined;
+  plans: PlansSelect[] | undefined;
 }) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
   const deletePlan = useMutation(
-    trpc.team.deleteSponsorshipPlan.mutationOptions({
+    trpc.team.deletePlan.mutationOptions({
       onMutate: () => {
         const toastId = toast.loading("Deleting plan...");
         return { toastId };
       },
       onSuccess: (_data, _vars, ctx) => {
         toast.success("Plan Deleted", { id: ctx.toastId });
-        void queryClient.invalidateQueries(
-          trpc.team.getSponsorshipPlans.queryOptions()
-        );
+        void queryClient.invalidateQueries(trpc.team.getPlans.queryOptions());
       },
       onError: (error, _vars, ctx) => {
         toast.error("Failed to delete plan", {
@@ -51,7 +49,7 @@ export default function SponsorshipPlanTable({
   );
 
   const deletePlanCallback = useCallback(
-    (plan: SponsorshipPlans) => {
+    (plan: PlansSelect) => {
       if (confirm(`Are you sure you want to delete "${plan.name}"?`)) {
         deletePlan.mutate({ id: plan.id });
       }
@@ -84,7 +82,7 @@ export default function SponsorshipPlanTable({
           ) : !plans || plans.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center h-24">
-                No sponsorship plans found
+                No plans found
               </TableCell>
             </TableRow>
           ) : (
@@ -140,7 +138,7 @@ export default function SponsorshipPlanTable({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1 items-center">
-                    <EditSponsorshipPlanDialog
+                    <EditPlanDialog
                       refetch={refetch}
                       plan={plan}
                       trigger={

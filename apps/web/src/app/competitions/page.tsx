@@ -1,8 +1,12 @@
 "use client";
 
+import { useTRPC } from "@/trpc/react";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { RegionKey, RegionRecord } from "@workspace/types";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
+import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
 import {
   Tabs,
   TabsContent,
@@ -22,7 +26,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const competitions = [
   {
@@ -201,10 +205,16 @@ const competitions = [
 ];
 
 function CompetitionContent({
+  region,
   competition,
 }: {
   competition: (typeof competitions)[0];
+  region: RegionKey;
 }) {
+  const trpc = useTRPC();
+  const { data: history, isLoading } = useQuery(
+    trpc.competition.getCompetitionsByRegion.queryOptions({ region })
+  );
   return (
     <div className="space-y-12">
       {/* Competition Overview */}
@@ -297,29 +307,39 @@ function CompetitionContent({
         </h3>
         <div className="max-w-3xl mx-auto">
           <div className="space-y-4">
-            {competition.ourHistory.map((entry, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
-                        <div className="text-sm font-medium">{entry.year}</div>
-                      </div>
-                      <div>
-                        <div className="font-semibold text-lg">
-                          {entry.result}
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : !history || history.length < 1 ? (
+              <div className="w-full flex items-center">
+                <p>no data to display</p>
+              </div>
+            ) : (
+              history.map((entry, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
+                          <div className="text-sm font-medium">
+                            {entry.year.getFullYear()}
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          {entry.score}
+                        <div>
+                          <div className="font-semibold text-lg">
+                            {entry.result}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {entry.description}
+                          </div>
                         </div>
                       </div>
+                      <Badge variant="outline">{entry.highlights[0]}</Badge>
                     </div>
-                    <Badge variant="outline">{entry.note}</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -328,12 +348,14 @@ function CompetitionContent({
 }
 
 export default function CompetitionsPage() {
-  const [selectedCompetition, setSelectedCompetition] = useState("urc");
-
+  const [selectedCompetition, setSelectedCompetition] =
+    useState<RegionKey>("urc");
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.competition.getCompetitions.queryOptions());
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-background via-background to-muted/20">
+      <section className="py-20 bg-linear-to-b from-background via-background to-muted/20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="outline" className="mb-6">
@@ -369,7 +391,9 @@ export default function CompetitionsPage() {
           <div className="md:hidden mb-8">
             <select
               value={selectedCompetition}
-              onChange={(e) => setSelectedCompetition(e.target.value)}
+              onChange={(e) =>
+                setSelectedCompetition(e.target.value as RegionKey)
+              }
               className="w-full p-3 border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="urc">University Rover Challenge</option>
@@ -391,7 +415,10 @@ export default function CompetitionsPage() {
 
               {competitions.map((competition) => (
                 <TabsContent key={competition.id} value={competition.id}>
-                  <CompetitionContent competition={competition} />
+                  <CompetitionContent
+                    competition={competition}
+                    region={competition.id as any}
+                  />
                 </TabsContent>
               ))}
             </Tabs>
@@ -403,7 +430,10 @@ export default function CompetitionsPage() {
               (competition) =>
                 selectedCompetition === competition.id && (
                   <div key={competition.id}>
-                    <CompetitionContent competition={competition} />
+                    <CompetitionContent
+                      competition={competition}
+                      region={selectedCompetition}
+                    />
                   </div>
                 )
             )}
@@ -426,7 +456,9 @@ export default function CompetitionsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">8+</div>
+                <div className="text-3xl font-bold text-primary mb-2">
+                  {data?.length}
+                </div>
                 <div className="text-sm text-muted-foreground">
                   Total Competitions
                 </div>
@@ -434,7 +466,9 @@ export default function CompetitionsPage() {
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">1</div>
+                <div className="text-3xl font-bold text-primary mb-2">
+                  {data?.filter((i) => i.featured).length}
+                </div>
                 <div className="text-sm text-muted-foreground">
                   Global Championship
                 </div>

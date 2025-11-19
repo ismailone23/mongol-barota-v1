@@ -59,13 +59,20 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
     defaultValues: {
       name: "",
       image: "",
+      status: "",
+      achievements: [],
+      features: [],
       description: "",
-      weight: "",
-      power: "",
-      arm: "",
-      dimentions: "",
-      from: new Date(),
-      until: undefined,
+      spec: {
+        arm: "",
+        autonomy: "",
+        communications: "",
+        dimensions: "",
+        power: "",
+        weight: "",
+      },
+      year: new Date(),
+      ended: undefined,
     },
   });
 
@@ -131,70 +138,32 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="tag"
-                render={({ field }) => {
-                  const tags = field.value || [];
-                  const addTag = () => {
-                    field.onChange([...tags, ""]);
-                  };
-                  const removeTag = (index: number) => {
-                    field.onChange(tags.filter((_, i) => i !== index));
-                  };
-                  const updateTag = (index: number, value: string) => {
-                    const updated = [...tags];
-                    updated[index] = value;
-                    field.onChange(updated);
-                  };
-
-                  return (
-                    <FormItem>
-                      <FormLabel>tags (optional)</FormLabel>
-                      <div className="space-y-2">
-                        {tags.map((tag, index) => (
-                          <div key={index} className="flex gap-2">
-                            <Input
-                              className="flex-1"
-                              placeholder="e.g., Autonomous navigation"
-                              value={tag}
-                              onChange={(e) => updateTag(index, e.target.value)}
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeTag(index)}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ))}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={addTag}
-                          className="w-full"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add Tag
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="https://example.com/rover.jpg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
 
               <FormField
                 control={form.control}
-                name="description"
+                name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Status</FormLabel>
                     <FormControl>
                       <Textarea
                         className="w-full"
-                        placeholder="Describe the rover's purpose and capabilities..."
+                        placeholder="Current Status"
                         {...field}
                       />
                     </FormControl>
@@ -207,7 +176,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="weight"
+                    name="spec.weight"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Weight</FormLabel>
@@ -227,7 +196,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="power"
+                    name="spec.power"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Power</FormLabel>
@@ -244,35 +213,57 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                   />
                 </div>
               </div>
+              <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="spec.arm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Arm</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="30cm adolf"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="spec.dimensions"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dimension</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="1.1m x 1.2m"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               <FormField
                 control={form.control}
-                name="arm"
+                name="spec.autonomy"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Arm Details</FormLabel>
+                    <FormLabel>Autonomy</FormLabel>
                     <FormControl>
                       <Input
                         className="w-full"
-                        placeholder="5-DOF robotic arm with gripper"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dimentions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dimensions</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="120cm x 80cm x 60cm"
+                        placeholder="Autonmated vision..."
                         {...field}
                       />
                     </FormControl>
@@ -341,7 +332,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="keyAchievements"
+                name="achievements"
                 render={({ field }) => {
                   const achievements = field.value || [];
                   const addAchievement = () => {
@@ -358,7 +349,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
 
                   return (
                     <FormItem>
-                      <FormLabel>Key Achievements (optional)</FormLabel>
+                      <FormLabel>Achievements</FormLabel>
                       <div className="space-y-2">
                         {achievements.map((achievement, index) => (
                           <div key={index} className="flex gap-2">
@@ -401,10 +392,10 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="from"
+                    name="year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Active From</FormLabel>
+                        <FormLabel>Development Time</FormLabel>
                         <FormControl>
                           <Input
                             type="date"
@@ -433,7 +424,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="until"
+                    name="ended"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Active Until (optional)</FormLabel>

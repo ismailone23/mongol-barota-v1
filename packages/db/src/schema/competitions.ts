@@ -1,64 +1,59 @@
 import { relations, sql } from "drizzle-orm";
-import { pgTable } from "drizzle-orm/pg-core";
-import { sponsors } from "./sponsots";
-import { teamMemberCompetitions } from "./team";
+import { pgEnum, pgTable } from "drizzle-orm/pg-core";
+import { sponsors } from "./sponsors";
+import { competitionMembers } from "./team";
 import { rovers } from "./rovers";
 
-export const participatedCompetitions = pgTable(
-  "participated_competition",
-  (t) => ({
-    id: t.uuid("id").notNull().defaultRandom().primaryKey().unique(),
-    competitionRegionName: t
-      .text("competition_region_name", {
-        enum: [
-          "University Rover Challenge",
-          "Anatolian Rover Challenge",
-          "European Rover Challenge",
-        ],
-      })
-      .notNull(),
-    competitionName: t.text("competition_name").notNull(),
-    competitionDescription: t.text("competition_description").notNull(),
-    location: t.text("competition_location").notNull(),
-    roverId: t
-      .uuid("rover_id")
-      .references(() => rovers.id, { onDelete: "cascade" })
-      .notNull(),
-    competitionResult: t.text("competition_result").notNull(),
-    featured: t.boolean("featured").default(false),
-    image: t.text("image").notNull(),
-    color: t.varchar("color").notNull(),
-    bgColor: t.varchar("bg_color").notNull(),
-    icon: t.varchar("icon").notNull(),
-    highlights: t
-      .text("competition_highlight")
-      .array()
-      .notNull()
-      .default(sql`ARRAY[]::text[]`),
-    participationYear: t
-      .timestamp("participation_year", {
-        withTimezone: true,
-        mode: "date",
-      })
-      .notNull(),
-    createdAt: t
-      .timestamp("created_at", { mode: "date", withTimezone: true })
-      .defaultNow()
-      .notNull(),
-  })
-);
+export const regionKeys = ["urc", "arc", "erc"] as const;
 
-export type CompetitionsInsert = typeof participatedCompetitions.$inferInsert;
-export type CompetitionsSelect = typeof participatedCompetitions.$inferSelect;
+export const regionEnum = pgEnum("region_key", regionKeys);
+export type Region = typeof regionKeys;
 
-export const participatedCompetitionsRelations = relations(
-  participatedCompetitions,
+export const competitions = pgTable("competitions", (t) => ({
+  id: t.uuid("id").notNull().defaultRandom().primaryKey().unique(),
+  region: regionEnum().notNull(),
+  name: t.text("name").notNull(),
+  description: t.text("description").notNull(),
+  location: t.text("location").notNull(),
+  roverId: t
+    .uuid("rover_id")
+    .references(() => rovers.id, { onDelete: "cascade" })
+    .notNull(),
+  result: t.text("result").notNull(),
+  featured: t.boolean("featured").default(false),
+  image: t.text("image").notNull(),
+  iconColor: t.varchar("icon_color").notNull(),
+  iconBg: t.varchar("icon_bg").notNull(),
+  icon: t.varchar("icon").notNull(),
+  highlights: t
+    .text("highlight")
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
+  year: t
+    .timestamp("participation_year", {
+      withTimezone: true,
+      mode: "date",
+    })
+    .notNull(),
+  score: t.varchar("score"),
+  createdAt: t
+    .timestamp("created_at", { mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+}));
+
+export type CompetitionsInsert = typeof competitions.$inferInsert;
+export type CompetitionsSelect = typeof competitions.$inferSelect;
+
+export const competitionsRelations = relations(
+  competitions,
   ({ one, many }) => ({
     rover: one(rovers, {
-      fields: [participatedCompetitions.roverId],
+      fields: [competitions.roverId],
       references: [rovers.id],
     }),
     sponsors: many(sponsors),
-    teamMemberCompetitions: many(teamMemberCompetitions),
+    competitionMembers: many(competitionMembers),
   })
 );

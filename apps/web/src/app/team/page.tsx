@@ -1,3 +1,6 @@
+"use client";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -21,6 +24,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { SubTeamRecord } from "@workspace/types";
+import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
 
 const leadership = [
   {
@@ -194,62 +199,6 @@ const subTeams = [
       "Power Systems",
       "Embedded Systems",
     ],
-    members: [
-      {
-        name: "Md Mahfuzur Rahman Ullash",
-        role: "Team Lead",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/ullash.jpg",
-      },
-      {
-        name: "Tahiya Iffat Mojumder",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/tahiya_iffat_mojumder.png",
-      },
-      {
-        name: "Balajee Bishwas",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/balajee_bishwas.png",
-      },
-      {
-        name: "Fateen Nur Fuad",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/fateen_nur_fuad.png",
-      },
-      {
-        name: "Md Habibur Rahman",
-        role: "Team Member",
-        department: "Aeronautical Engineering",
-        image: "/Team/Electrical/md_habibur_rahman.jpg",
-      },
-      {
-        name: "Mehrin Islam Prity",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/mehrin_islam_prity.png",
-      },
-      {
-        name: "Saber Toha",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/Electrical/saber_toha.png",
-      },
-      {
-        name: "Samiul Kabir",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/samiul_kabir.jpg",
-      },
-      {
-        name: "Tasmia Masnur",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Electrical/tasmia_masnur.png",
-      },
-    ],
   },
   {
     id: "software",
@@ -270,62 +219,6 @@ const subTeams = [
       "Communication Systems",
       "UI/UX Design",
       "System Integration",
-    ],
-    members: [
-      {
-        name: "Istiaque Ahmed Arik",
-        role: "Team Lead",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/istiaque_ahhmed_arik.jpg",
-      },
-      {
-        name: "Abdullah Al Sahariar",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/abdullah_al_shahariar.jpg",
-      },
-      {
-        name: "Md Ariful Islam",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/md_ariful_islam.jpg",
-      },
-      {
-        name: "Labiba Ibnat Matin",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/labiba_ibnat_matin.jpg",
-      },
-      {
-        name: "Balajee Biswas",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/soft/balajee_biswas.jpg",
-      },
-      {
-        name: "Md Arif Sadik Molla",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/md_arif_sadik_molla.jpg",
-      },
-      {
-        name: "Najifa Raksanda",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/najifa_raksanda.jpg",
-      },
-      {
-        name: "Nujhat Nazifah Nawal",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/nujhat_nazifah_nawal.jpg",
-      },
-      {
-        name: "Syed Zahin Waheed",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/soft/syed_zahin_waheed.jpg",
-      },
     ],
   },
   {
@@ -348,44 +241,6 @@ const subTeams = [
       "Research Methods",
       "Scientific Writing",
     ],
-    members: [
-      {
-        name: "Savera Momtaz",
-        role: "Technical Team Lead",
-        department: "Computer Science & Engineering",
-        image: "/Team/Science/saver_momtaz.jpg",
-      },
-      {
-        name: "Mahir Tajwar",
-        role: "Theory Team Lead",
-        department: "Petroleum and Mining Engineering",
-        image: "/Team/Science/mahit_tajwar.jpg",
-      },
-      {
-        name: "Mehjabeen Tabassum Dewan",
-        role: "Team Member",
-        department: "Petroleum and Mining Engineering",
-        image: "/Team/Science/mehjabeen_tabassum_dewan.jpg",
-      },
-      {
-        name: "Miraz Bin Misbah",
-        role: "Team Member",
-        department: "Mechanical Engineering",
-        image: "/Team/Science/miraz_bin_misbah.jpg",
-      },
-      {
-        name: "Samira Tasnim Huq",
-        role: "Team Member",
-        department: "Petroleum and Mining Engineering",
-        image: "/Team/Science/samira_tasnim_huq.jpg",
-      },
-      {
-        name: "Tanvir Ahmed",
-        role: "Team Member",
-        department: "Mechanical Engineering",
-        image: "/Team/Science/tanvir_ahmed.jpg",
-      },
-    ],
   },
   {
     id: "management",
@@ -402,56 +257,6 @@ const subTeams = [
       "Event coordination and logistics",
     ],
     skills: ["Project Management", "Communication", "Finance", "Marketing"],
-    members: [
-      {
-        name: "Md Ariful Islam",
-        role: "Team Lead",
-        department: "Computer Science & Engineering",
-        image: "/Team/Mgt/md_ariful_islam.jpg",
-      },
-      {
-        name: "Ashfia Tabassum",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/Mgt/ashfia_tabassum.jpg",
-      },
-      {
-        name: "Tamim Rizvee",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/Mgt/tamim_rizvee.jpg",
-      },
-      {
-        name: "Tahiya Iffat Mojumder",
-        role: "Team Member",
-        department: "Electrical Electronics and Communication Engineering",
-        image: "/Team/Mgt/tahiya_iffat_mojumder.jpg",
-      },
-      {
-        name: "Mushfique Rahman",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/Mgt/mushfique_rahman.jpg",
-      },
-      {
-        name: "Nazifa Raksanda",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/Mgt/nazifa_raksanda.jpg",
-      },
-      {
-        name: "Abid Ikram",
-        role: "Team Member",
-        department: "Mechanical Engineering",
-        image: "/Team/Mgt/abid_ikram.jpg",
-      },
-      {
-        name: "Rahik Mohammad",
-        role: "Team Member",
-        department: "Industrial & Production Engineering",
-        image: "/Team/Mgt/rahik_mohammad.jpg",
-      },
-    ],
   },
   {
     id: "communications",
@@ -473,46 +278,19 @@ const subTeams = [
       "Network Protocols",
       "Telemetry & Dashboard Development",
     ],
-    members: [
-      {
-        name: "Sameen Abrar",
-        role: "Team Lead",
-        department: "Computer Science & Engineering",
-        image: "/Team/comms/sameen_abrar.jpg",
-      },
-      {
-        name: "Bijoy Sarkar",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/comms/bijoy_sarkar.jpg",
-      },
-      {
-        name: "Farhan Mugdho",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/comms/farhan_mugdho.jpg",
-      },
-      {
-        name: "Mushfiqur Rahman",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/comms/mushfiqur_rahman.jpg",
-      },
-      {
-        name: "Saber Toha",
-        role: "Team Member",
-        department: "Computer Science & Engineering",
-        image: "/Team/comms/saber_toha.jpg",
-      },
-    ],
   },
 ];
 
 export default function TeamPage() {
+  const trpc = useTRPC();
+  const { data: teamDetails, isLoading } = useQuery(
+    trpc.team.getMembers.queryOptions()
+  );
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-background via-background to-muted/20">
+      <section className="py-20 bg-linear-to-br from-background via-background to-muted/20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="outline" className="mb-6">
@@ -558,86 +336,96 @@ export default function TeamPage() {
           </div>
 
           <div className="grid gap-8 max-w-5xl mx-auto">
-            {leadership.map((leader, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-8">
-                  <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-                    <div className="relative w-full max-w-xs mx-auto lg:mx-0 aspect-square overflow-hidden rounded-3xl">
-                      <Image
-                        src={leader.image || "/placeholder.svg"}
-                        alt={leader.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 320px, 384px"
-                      />
-                    </div>
-                    <div className="flex-1 space-y-4 text-center lg:text-left">
-                      <div>
-                        <h3 className="text-2xl font-bold mb-2">
-                          {leader.name}
-                        </h3>
-                        <Badge variant="secondary" className="text-sm">
-                          {leader.role}
-                        </Badge>
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : !teamDetails || teamDetails.length < 1 ? (
+              <p>Something went wrong!</p>
+            ) : (
+              teamDetails
+                .filter((team) => team.subTeam == "LT")
+                .map((leader, index) => (
+                  <Card
+                    key={index}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <CardContent className="p-8">
+                      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+                        <div className="relative w-full max-w-xs mx-auto lg:mx-0 aspect-square overflow-hidden rounded-3xl">
+                          <Image
+                            src={leader.image || "/placeholder.svg"}
+                            alt={leader.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 1024px) 320px, 384px"
+                          />
+                        </div>
+                        <div className="flex-1 space-y-4 text-center lg:text-left">
+                          <div>
+                            <h3 className="text-2xl font-bold mb-2">
+                              {leader.name}
+                            </h3>
+                            <Badge variant="secondary" className="text-sm">
+                              {leader.role}
+                            </Badge>
+                          </div>
+                          <div className="grid gap-1 text-sm text-muted-foreground">
+                            <span className="font-medium text-foreground">
+                              {leader.department}
+                            </span>
+                            <span>{leader.bio}</span>
+                          </div>
+                          <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
+                            <Button
+                              asChild
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                            >
+                              <Link href={`mailto:${leader.email}`}>
+                                <Mail className="w-4 h-4" />
+                                <span className="ml-2">Email</span>
+                              </Link>
+                            </Button>
+                            <Button
+                              asChild
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                            >
+                              <Link href={`tel:${leader.phone}`}>
+                                <Phone className="w-4 h-4" />
+                                <span className="ml-2">Call</span>
+                              </Link>
+                            </Button>
+                            <Button
+                              asChild
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                            >
+                              <Link href={leader.linkedin || "#"}>
+                                <Linkedin className="w-4 h-4" />
+                                <span className="ml-2">LinkedIn</span>
+                              </Link>
+                            </Button>
+                            <Button
+                              asChild
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                            >
+                              <Link href={leader.github || "#"}>
+                                <Github className="w-4 h-4" />
+                                <span className="ml-2">GitHub</span>
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="grid gap-1 text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground">
-                          {leader.department}
-                        </span>
-                        <span>{leader.level}</span>
-                        <span>{leader.bio}</span>
-                      </div>
-                      <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="rounded-full"
-                        >
-                          <Link href={`mailto:${leader.email}`}>
-                            <Mail className="w-4 h-4" />
-                            <span className="ml-2">Email</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="rounded-full"
-                        >
-                          <Link href={`tel:${leader.phone}`}>
-                            <Phone className="w-4 h-4" />
-                            <span className="ml-2">Call</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="rounded-full"
-                        >
-                          <Link href={leader.linkedin || "#"}>
-                            <Linkedin className="w-4 h-4" />
-                            <span className="ml-2">LinkedIn</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="rounded-full"
-                        >
-                          <Link href={leader.github || "#"}>
-                            <Github className="w-4 h-4" />
-                            <span className="ml-2">GitHub</span>
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </CardContent>
+                  </Card>
+                ))
+            )}
           </div>
         </div>
       </section>
@@ -656,66 +444,80 @@ export default function TeamPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {facultyAdvisors.map((advisor, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6 space-y-4">
-                  <div className="relative mx-auto w-32 h-32 overflow-hidden rounded-3xl">
-                    <Image
-                      src={advisor.image || "/placeholder.svg"}
-                      alt={advisor.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="space-y-2 text-center">
-                    <h3 className="font-semibold text-base">{advisor.name}</h3>
-                    <Badge
-                      variant="outline"
-                      className="text-xs px-3 py-1 rounded-full"
-                    >
-                      {advisor.role}
-                    </Badge>
-                    {advisor.title && (
-                      <div className="text-xs text-muted-foreground">
-                        {advisor.title}
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : !teamDetails || teamDetails.length < 1 ? (
+              <p>Something went wrong!</p>
+            ) : (
+              teamDetails
+                .filter((team) => team.subTeam == "FA")
+                .map((advisor, index) => (
+                  <Card
+                    key={index}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <CardContent className="p-6 space-y-4">
+                      <div className="relative mx-auto w-32 h-32 overflow-hidden rounded-3xl">
+                        <Image
+                          src={advisor.image || "/placeholder.svg"}
+                          alt={advisor.name}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
-                    )}
-                    <div className="text-xs text-muted-foreground">
-                      {advisor.department}
-                    </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {advisor.bio}
-                    </p>
-                  </div>
-                  <div className="flex justify-center gap-3">
-                    {advisor.email && (
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="rounded-full"
-                      >
-                        <Link href={`mailto:${advisor.email}`}>
-                          <Mail className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    )}
-                    {advisor.phone && (
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="rounded-full"
-                      >
-                        <Link href={`tel:${advisor.phone}`}>
-                          <Phone className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                      <div className="space-y-2 text-center">
+                        <h3 className="font-semibold text-base">
+                          {advisor.title}
+                          {advisor.name}
+                        </h3>
+                        <Badge
+                          variant="outline"
+                          className="text-xs px-3 py-1 rounded-full"
+                        >
+                          {advisor.role}
+                        </Badge>
+                        {advisor.about && (
+                          <div className="text-xs text-muted-foreground">
+                            {advisor.about}
+                          </div>
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          {advisor.department}
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {advisor.bio}
+                        </p>
+                      </div>
+                      <div className="flex justify-center gap-3">
+                        {advisor.email && (
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            <Link href={`mailto:${advisor.email}`}>
+                              <Mail className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        )}
+                        {advisor.phone && (
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            <Link href={`tel:${advisor.phone}`}>
+                              <Phone className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+            )}
           </div>
         </div>
       </section>
@@ -772,7 +574,7 @@ export default function TeamPage() {
                             key={i}
                             className="text-sm text-muted-foreground flex items-start gap-2"
                           >
-                            <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 shrink-0" />
                             {responsibility}
                           </li>
                         ))}
@@ -801,38 +603,46 @@ export default function TeamPage() {
                     Team Members
                   </h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {team.members.map((member, i) => (
-                      <Card
-                        key={i}
-                        className="hover:shadow-lg transition-shadow"
-                      >
-                        <CardContent className="p-6 space-y-4">
-                          <div className="relative w-65 h-65 mx-auto overflow-hidden rounded-3xl">
-                            <Image
-                              src={member.image || "/placeholder.svg"}
-                              alt={member.name}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 112px, 144px"
-                            />
-                          </div>
-                          <div className="space-y-2 text-center">
-                            <h5 className="font-semibold text-base">
-                              {member.name}
-                            </h5>
-                            <Badge
-                              variant="secondary"
-                              className="text-xs px-3 py-1 rounded-full"
-                            >
-                              {member.role}
-                            </Badge>
-                            <div className="text-xs text-muted-foreground leading-relaxed">
-                              {member.department}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    {isLoading ? (
+                      <LoadingSpinner />
+                    ) : !teamDetails || teamDetails.length < 1 ? (
+                      <p>Something went wrong!</p>
+                    ) : (
+                      teamDetails
+                        .filter((td) => SubTeamRecord[td.subTeam] == team.name)
+                        .map((member, i) => (
+                          <Card
+                            key={i}
+                            className="hover:shadow-lg transition-shadow"
+                          >
+                            <CardContent className="p-6 space-y-4">
+                              <div className="relative w-65 h-65 mx-auto overflow-hidden rounded-3xl">
+                                <Image
+                                  src={member.image || "/placeholder.svg"}
+                                  alt={member.name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="(max-width: 768px) 112px, 144px"
+                                />
+                              </div>
+                              <div className="space-y-2 text-center">
+                                <h5 className="font-semibold text-base">
+                                  {member.name}
+                                </h5>
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs px-3 py-1 rounded-full"
+                                >
+                                  {member.role}
+                                </Badge>
+                                <div className="text-xs text-muted-foreground leading-relaxed">
+                                  {member.department}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))
+                    )}
                   </div>
                 </div>
               </TabsContent>

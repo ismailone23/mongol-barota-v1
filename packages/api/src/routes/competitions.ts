@@ -1,18 +1,20 @@
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import {
-  participatedCompetitions,
+  competitions,
+  CompetitionsSelect,
   rovers,
-  sponsors,
-  teamMemberCompetitions,
-  teamMembers,
+  competitionMembers,
+  members,
+  MemberSelect,
+  RoversSelect,
 } from "@workspace/db/schema";
-import { desc, eq, gte, isNull, or } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, or } from "drizzle-orm";
 import * as z from "zod";
 import {
-  competitionRegions,
   CreateCompetitionSchema,
   CreateRoverSchema,
+  RegionEnum,
   UpdateCompetitionSchema,
   UpdateRoverSchema,
 } from "@workspace/types";
@@ -21,9 +23,11 @@ export const competitionRoute = createTRPCRouter({
   createCompetition: protectedProcedure
     .input(CreateCompetitionSchema)
     .mutation(async ({ ctx, input }) => {
+      const { teamMemberIds, ...competitionData } = input;
+
       const [competition] = await ctx.db
-        .insert(participatedCompetitions)
-        .values(input)
+        .insert(competitions)
+        .values(competitionData)
         .returning();
 
       if (!competition) {
@@ -33,18 +37,30 @@ export const competitionRoute = createTRPCRouter({
         });
       }
 
+      if (teamMemberIds && teamMemberIds.length > 0) {
+        const memberEntries = teamMemberIds.map((memberId) => ({
+          competitionId: competition.id,
+          teamMemberId: memberId,
+        }));
+
+        await ctx.db
+          .insert(competitionMembers)
+          .values(memberEntries)
+          .onConflictDoNothing();
+      }
+
       return { competition, message: "Competition created successfully" };
     }),
 
   updateCompetition: protectedProcedure
     .input(UpdateCompetitionSchema)
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
+      const { id, teamMemberIds, ...data } = input;
 
       const [updatedCompetition] = await ctx.db
-        .update(participatedCompetitions)
+        .update(competitions)
         .set(data)
-        .where(eq(participatedCompetitions.id, id))
+        .where(eq(competitions.id, id))
         .returning();
 
       if (!updatedCompetition) {
@@ -52,6 +68,24 @@ export const competitionRoute = createTRPCRouter({
           code: "NOT_FOUND",
           message: "Competition not found",
         });
+      }
+
+      if (teamMemberIds !== undefined) {
+        await ctx.db
+          .delete(competitionMembers)
+          .where(eq(competitionMembers.competitionId, id));
+
+        if (teamMemberIds.length > 0) {
+          const memberEntries = teamMemberIds.map((memberId) => ({
+            competitionId: id,
+            teamMemberId: memberId,
+          }));
+
+          await ctx.db
+            .insert(competitionMembers)
+            .values(memberEntries)
+            .onConflictDoNothing();
+        }
       }
 
       return {
@@ -64,8 +98,8 @@ export const competitionRoute = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const [deletedCompetition] = await ctx.db
-        .delete(participatedCompetitions)
-        .where(eq(participatedCompetitions.id, input.id))
+        .delete(competitions)
+        .where(eq(competitions.id, input.id))
         .returning();
 
       if (!deletedCompetition) {
@@ -79,22 +113,52 @@ export const competitionRoute = createTRPCRouter({
     }),
 
   getCompetitions: publicProcedure.query(async ({ ctx }) => {
-    const competitions = await ctx.db
+    return await ctx.db
       .select()
-      .from(participatedCompetitions)
-      .orderBy(desc(participatedCompetitions.participationYear));
-
-    return competitions;
+      .from(competitions)
+      .orderBy(desc(competitions.year));
   }),
 
+  getCompetitionWithMembers: publicProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const [competition] = await ctx.db
+        .select()
+        .from(competitions)
+        .where(eq(competitions.id, input.id));
+
+      if (!competition) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Competition not found",
+        });
+      }
+
+      // Then get all team members for this competition
+      const currentMembers = await ctx.db
+        .select({
+          member: members,
+        })
+        .from(competitionMembers)
+        .innerJoin(members, eq(competitionMembers.teamMemberId, members.id))
+        .where(eq(competitionMembers.competitionId, input.id));
+
+      return {
+        ...competition,
+        competitionMembers: currentMembers.map((m) => ({
+          competitionId: input.id,
+          teamMember: m.member,
+        })),
+      };
+    }),
   // Get Single Competition
   getCompetition: publicProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const [competition] = await ctx.db
         .select()
-        .from(participatedCompetitions)
-        .where(eq(participatedCompetitions.id, input.id));
+        .from(competitions)
+        .where(eq(competitions.id, input.id));
 
       if (!competition) {
         throw new TRPCError({
@@ -106,142 +170,100 @@ export const competitionRoute = createTRPCRouter({
       return competition;
     }),
 
-  // Get Featured Competitions
-  getFeaturedCompetitions: publicProcedure.query(async ({ ctx }) => {
-    const featuredCompetitions = await ctx.db
-      .select()
-      .from(participatedCompetitions)
-      .where(eq(participatedCompetitions.featured, true))
-      .orderBy(desc(participatedCompetitions.participationYear));
-
-    return featuredCompetitions;
-  }),
-
   // Get Competitions by Region
   getCompetitionsByRegion: publicProcedure
     .input(
       z.object({
-        regionName: z.enum(competitionRegions),
+        region: RegionEnum,
       })
     )
     .query(async ({ ctx, input }) => {
-      const competitions = await ctx.db
+      return await ctx.db
         .select()
-        .from(participatedCompetitions)
-        .where(
-          eq(participatedCompetitions.competitionRegionName, input.regionName)
-        )
-        .orderBy(desc(participatedCompetitions.participationYear));
-
-      return competitions;
+        .from(competitions)
+        .where(eq(competitions.region, input.region))
+        .orderBy(desc(competitions.year));
     }),
 
   // Get Competitions by Rover
   getCompetitionsByRover: publicProcedure
     .input(z.object({ roverId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      const competitions = await ctx.db
+      const competition = await ctx.db
         .select()
-        .from(participatedCompetitions)
-        .where(eq(participatedCompetitions.roverId, input.roverId))
-        .orderBy(desc(participatedCompetitions.participationYear));
+        .from(competitions)
+        .where(eq(competitions.roverId, input.roverId))
+        .orderBy(desc(competitions.year));
 
-      return competitions;
+      return competition;
     }),
 
-  // Get Competition with Relations (rover, sponsors, team members)
-  getCompetitionWithRelations: publicProcedure
-    .input(z.object({ id: z.string().uuid() }))
-    .query(async ({ ctx, input }) => {
-      // Get competition with rover
-      const [competitionWithRover] = await ctx.db
-        .select({
-          competition: participatedCompetitions,
-          rover: rovers,
-        })
-        .from(participatedCompetitions)
-        .leftJoin(rovers, eq(participatedCompetitions.roverId, rovers.id))
-        .where(eq(participatedCompetitions.id, input.id));
+  getFullCompetitionData: publicProcedure.query(async ({ ctx }) => {
+    // each row will contain competition, rover and a single member (if any)
+    const rows = await ctx.db
+      .select({
+        competition: competitions,
+        rover: rovers,
+        member: members,
+        competitionId: competitionMembers.competitionId,
+      })
+      .from(competitionMembers)
+      .innerJoin(
+        competitions,
+        eq(competitions.id, competitionMembers.competitionId)
+      )
+      .innerJoin(members, eq(members.id, competitionMembers.teamMemberId))
+      .innerJoin(rovers, eq(competitions.roverId, rovers.id))
+      .orderBy(desc(competitions.year));
 
-      if (!competitionWithRover) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Competition not found",
+    const map = new Map<
+      string,
+      {
+        competition: CompetitionsSelect;
+        rover: RoversSelect;
+        members: MemberSelect[];
+      }
+    >();
+
+    for (const r of rows) {
+      const id = r.competitionId;
+      if (!map.has(id)) {
+        map.set(id, {
+          competition: r.competition,
+          rover: r.rover,
+          members: [],
         });
       }
+      map.get(id)!.members.push(r.member);
+    }
 
-      // Get sponsors for this competition
-      const competitionSponsors = await ctx.db
-        .select()
-        .from(sponsors)
-        .where(eq(sponsors.competitionId, input.id));
+    // preserve order from the query by iterating rows and keeping insertion order
+    const result: {
+      competition: CompetitionsSelect;
+      rover: RoversSelect;
+      members: MemberSelect[];
+    }[] = [];
 
-      // Get team members for this competition
-      const competitionTeamMembers = await ctx.db
-        .select({
-          teamMember: teamMembers,
-          relation: teamMemberCompetitions,
-        })
-        .from(teamMemberCompetitions)
-        .leftJoin(
-          teamMembers,
-          eq(teamMemberCompetitions.teamMemberId, teamMembers.id)
-        )
-        .where(eq(teamMemberCompetitions.competitionId, input.id));
+    for (const [, value] of map) result.push(value);
 
-      return {
-        ...competitionWithRover.competition,
-        rover: competitionWithRover.rover,
-        sponsors: competitionSponsors,
-        teamMembers: competitionTeamMembers.map((tm) => ({
-          ...tm.teamMember,
-          role: tm.relation.role,
-        })),
-      };
-    }),
-
-  // Get All Competitions with Rover Details
-  getAllCompetitionsWithRovers: publicProcedure.query(async ({ ctx }) => {
-    const competitions = await ctx.db
-      .select({
-        competition: participatedCompetitions,
-        rover: rovers,
-      })
-      .from(participatedCompetitions)
-      .leftJoin(rovers, eq(participatedCompetitions.roverId, rovers.id))
-      .orderBy(desc(participatedCompetitions.participationYear));
-
-    return competitions.map((c) => ({
-      ...c.competition,
-      rover: c.rover,
-    }));
+    return result;
   }),
 
   // Get Competition Statistics
   getCompetitionStats: publicProcedure.query(async ({ ctx }) => {
-    const allCompetitions = await ctx.db
-      .select()
-      .from(participatedCompetitions);
+    const allCompetitions = await ctx.db.select().from(competitions);
 
     const stats = {
       total: allCompetitions.length,
       featured: allCompetitions.filter((c) => c.featured).length,
       byRegion: {
-        URC: allCompetitions.filter(
-          (c) => c.competitionRegionName === "University Rover Challenge"
-        ).length,
-        ARC: allCompetitions.filter(
-          (c) => c.competitionRegionName === "Anatolian Rover Challenge"
-        ).length,
-        ERC: allCompetitions.filter(
-          (c) => c.competitionRegionName === "European Rover Challenge"
-        ).length,
+        URC: allCompetitions.filter((c) => c.region === "urc").length,
+        ARC: allCompetitions.filter((c) => c.region === "arc").length,
+        ERC: allCompetitions.filter((c) => c.region === "erc").length,
       },
       latestYear:
         allCompetitions.length > 0
-          ? Math.max(
-              ...allCompetitions.map((c) => c.participationYear.getFullYear())
-            )
+          ? Math.max(...allCompetitions.map((c) => c.year.getFullYear()))
           : null,
     };
 
@@ -262,7 +284,6 @@ export const competitionRoute = createTRPCRouter({
       return { rover, message: "Rover created successfully" };
     }),
 
-  // Update Rover
   updateRover: protectedProcedure
     .input(UpdateRoverSchema)
     .mutation(async ({ ctx, input }) => {
@@ -305,7 +326,10 @@ export const competitionRoute = createTRPCRouter({
 
   // Get All Rovers
   getRovers: publicProcedure.query(async ({ ctx }) => {
-    const allRovers = await ctx.db.select().from(rovers).orderBy(rovers.from);
+    const allRovers = await ctx.db
+      .select()
+      .from(rovers)
+      .orderBy(desc(rovers.year));
 
     return allRovers;
   }),
@@ -329,13 +353,12 @@ export const competitionRoute = createTRPCRouter({
       return rover;
     }),
 
-  // Get Active Rovers (where until is null or in the future)
   getActiveRovers: publicProcedure.query(async ({ ctx }) => {
     const activeRovers = await ctx.db
       .select()
       .from(rovers)
-      .where(or(isNull(rovers.until), gte(rovers.until, new Date())))
-      .orderBy(rovers.from);
+      .where(or(isNull(rovers.ended), gte(rovers.ended, new Date())))
+      .orderBy(rovers.year);
 
     return activeRovers;
   }),

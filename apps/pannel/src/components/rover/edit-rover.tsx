@@ -71,15 +71,12 @@ export default function EditRoverDialog({
       name: rover.name,
       image: rover.image,
       description: rover.description,
-      weight: rover.weight,
-      power: rover.power,
+      spec: rover.spec,
       features: rover.features,
-      tag: rover.tag,
-      keyAchievements: rover.keyAchievements,
-      arm: rover.arm,
-      dimentions: rover.dimentions,
-      from: rover.from,
-      until: rover.until || undefined,
+      status: rover.status,
+      achievements: rover.achievements,
+      year: rover.year,
+      ended: rover.ended || undefined,
     },
   });
 
@@ -89,16 +86,13 @@ export default function EditRoverDialog({
       id: rover.id,
       name: rover.name,
       image: rover.image,
-      tag: rover.tag,
+      status: rover.status,
       description: rover.description,
       features: rover.features,
-      keyAchievements: rover.keyAchievements,
-      weight: rover.weight,
-      power: rover.power,
-      arm: rover.arm,
-      dimentions: rover.dimentions,
-      from: rover.from,
-      until: rover.until || undefined,
+      achievements: rover.achievements,
+      spec: rover.spec,
+      year: rover.year,
+      ended: rover.ended || undefined,
     });
   }, [rover, form]);
 
@@ -164,60 +158,21 @@ export default function EditRoverDialog({
 
               <FormField
                 control={form.control}
-                name="tag"
-                render={({ field }) => {
-                  const tags = field.value || [];
-                  const addTag = () => {
-                    field.onChange([...tags, ""]);
-                  };
-                  const removeTag = (index: number) => {
-                    field.onChange(tags.filter((_, i) => i !== index));
-                  };
-                  const updateTag = (index: number, value: string) => {
-                    const updated = [...tags];
-                    updated[index] = value;
-                    field.onChange(updated);
-                  };
-
-                  return (
-                    <FormItem>
-                      <FormLabel>tags (optional)</FormLabel>
-                      <div className="space-y-2">
-                        {tags.map((tag, index) => (
-                          <div key={index} className="flex gap-2">
-                            <Input
-                              className="flex-1"
-                              placeholder="e.g., Autonomous navigation"
-                              value={tag}
-                              onChange={(e) => updateTag(index, e.target.value)}
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeTag(index)}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ))}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={addTag}
-                          className="w-full"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add Tag
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="https://example.com/rover.jpg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-
               <FormField
                 control={form.control}
                 name="description"
@@ -240,7 +195,7 @@ export default function EditRoverDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="weight"
+                    name="spec.weight"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Weight</FormLabel>
@@ -260,7 +215,7 @@ export default function EditRoverDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="power"
+                    name="spec.power"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Power</FormLabel>
@@ -277,42 +232,47 @@ export default function EditRoverDialog({
                   />
                 </div>
               </div>
+              <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="spec.arm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Arm</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="25 kg"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <FormField
-                control={form.control}
-                name="arm"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Arm Details</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="5-DOF robotic arm with gripper"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dimentions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dimensions</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="120cm x 80cm x 60cm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="spec.dimensions"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dimensions</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="100W Solar"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
 
               <FormField
                 control={form.control}
@@ -374,7 +334,7 @@ export default function EditRoverDialog({
 
               <FormField
                 control={form.control}
-                name="keyAchievements"
+                name="achievements"
                 render={({ field }) => {
                   const achievements = field.value || [];
                   const addAchievement = () => {
@@ -434,10 +394,10 @@ export default function EditRoverDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="from"
+                    name="year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Active From</FormLabel>
+                        <FormLabel>Active year</FormLabel>
                         <FormControl>
                           <Input
                             type="date"
@@ -466,10 +426,10 @@ export default function EditRoverDialog({
                 <div className="flex-1">
                   <FormField
                     control={form.control}
-                    name="until"
+                    name="ended"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Active Until (optional)</FormLabel>
+                        <FormLabel>Active ended (optional)</FormLabel>
                         <FormControl>
                           <Input
                             type="date"

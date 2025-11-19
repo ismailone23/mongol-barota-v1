@@ -33,7 +33,7 @@ export default function Page() {
     );
   }
   if (data) {
-    if (!data.isUser) {
+    if (data.isUser) {
       return <ForceSignOut />;
     }
   }

@@ -37,12 +37,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
+import { uploadImage } from "@/utils";
 
 type FormValues = z.infer<typeof CreateMemberSchema>;
 
 export default function CreateMemberDialog({ refetch }: { refetch: any }) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const createMember = useMutation(
     trpc.team.createMember.mutationOptions({
@@ -55,6 +58,8 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
         refetch();
         form.reset();
         setOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl("");
       },
       onError: (error, _vars, ctx) => {
         toast.error("Failed to create member", {
@@ -82,9 +87,46 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
     },
   });
 
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
+    },
+    []
+  );
+
   const onSubmit = useCallback(
-    (values: FormValues) => {
-      createMember.mutate(values);
+    async (values: FormValues) => {
+      try {
+        let imageUrl = values.image;
+
+        if (selectedFile) {
+          const uploadToastId = toast.loading("Uploading image...");
+          try {
+            imageUrl = await uploadImage(selectedFile);
+            toast.success("Image uploaded", { id: uploadToastId });
+          } catch (error) {
+            toast.error(`Failed to upload image: ${error}`, {
+              id: uploadToastId,
+            });
+            return;
+          }
+        }
+
+        // Mutate with the uploaded image URL
+        createMember.mutate({
+          ...values,
+          image: imageUrl,
+        });
+      } catch (error) {
+        toast.error(`An error occurred ${error}`);
+        console.log(error);
+      }
     },
     [createMember]
   );
@@ -107,40 +149,44 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
               className="space-y-6 w-full max-w-full"
             >
               <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="w-full"
-                          placeholder="John Doe"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="w-full"
-                          placeholder="Lt Col | Lecturer"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="John Doe"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="Lt Col | Lecturer"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <FormField
@@ -148,13 +194,27 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Rover Image</FormLabel>
                     <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/image.jpg"
-                        {...field}
-                      />
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full"
+                          />
+                        </div>
+                        {previewUrl && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                            <img
+                              src={previewUrl}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

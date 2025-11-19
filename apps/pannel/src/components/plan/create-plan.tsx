@@ -164,7 +164,7 @@ export default function CreatePlanDialog({ refetch }: { refetch: any }) {
                     <FormItem>
                       <FormLabel>Price Label (optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="per year" {...field} />
+                        <Input placeholder="Amount" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

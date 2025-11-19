@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Tabs,
@@ -11,8 +12,31 @@ import Rover from "@/components/rover";
 import Competition from "@/components/competitions";
 import Sponser from "@/components/sponsers";
 import Plan from "@/components/plan";
+import { useSession } from "next-auth/react";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
+import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
+import { ForceSignOut } from "@/components/auth/force-signout";
 
 export default function Page() {
+  const session = useSession();
+  const trpc = useTRPC();
+
+  const { data, isLoading } = useQuery(
+    trpc.auth.isActualUser.queryOptions({ email: session.data?.user.email })
+  );
+  if (isLoading) {
+    return (
+      <div className="w-full h-full items-center justify-center">
+        <LoadingSpinner className="w-16 h-16" />
+      </div>
+    );
+  }
+  if (data) {
+    if (!data.isUser) {
+      return <ForceSignOut />;
+    }
+  }
   return (
     <div className="flex flex-col w-full items-center justify-center">
       <div className="max-w-[1200px] w-full flex flex-col items-center">

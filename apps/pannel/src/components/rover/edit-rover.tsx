@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 import { RoversInsert } from "@workspace/db/schema";
 import { Plus, X } from "lucide-react";
+import { uploadImage } from "@/utils";
 
 type FormValues = z.infer<typeof UpdateRoverSchema>;
 
@@ -43,6 +44,8 @@ export default function EditRoverDialog({
 }: EditRoverDialogProps) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const updateRover = useMutation(
     trpc.competition.updateRover.mutationOptions({
@@ -54,6 +57,8 @@ export default function EditRoverDialog({
         toast.success("Rover Updated", { id: ctx.toastId });
         refetch();
         setOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl("");
       },
       onError: (error, _vars, ctx) => {
         toast.error("Failed to update rover", {
@@ -80,27 +85,67 @@ export default function EditRoverDialog({
     },
   });
 
-  // Reset form when rover prop changes
   useEffect(() => {
-    form.reset({
-      id: rover.id,
-      name: rover.name,
-      image: rover.image,
-      status: rover.status,
-      description: rover.description,
-      features: rover.features,
-      achievements: rover.achievements,
-      spec: rover.spec,
-      year: rover.year,
-      ended: rover.ended || undefined,
-    });
-  }, [rover, form]);
+    if (open) {
+      form.reset({
+        id: rover.id,
+        name: rover.name,
+        image: rover.image,
+        status: rover.status,
+        description: rover.description,
+        features: rover.features,
+        achievements: rover.achievements,
+        spec: rover.spec,
+        year: rover.year,
+        ended: rover.ended || undefined,
+      });
+      setSelectedFile(null);
+      setPreviewUrl("");
+    }
+  }, [rover, form, open]);
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
+    },
+    []
+  );
 
   const onSubmit = useCallback(
-    (values: FormValues) => {
-      updateRover.mutate(values);
+    async (values: FormValues) => {
+      try {
+        let imageUrl = values.image;
+
+        // Only upload if a new file was selected
+        if (selectedFile) {
+          const uploadToastId = toast.loading("Uploading image...");
+          try {
+            imageUrl = await uploadImage(selectedFile);
+            toast.success("Image uploaded", { id: uploadToastId });
+          } catch (error) {
+            toast.error(`Failed to upload image: ${error}`, {
+              id: uploadToastId,
+            });
+            return;
+          }
+        }
+
+        // Update with the new image URL (or keep the old one)
+        updateRover.mutate({
+          ...values,
+          image: imageUrl,
+        });
+      } catch (error) {
+        toast.error("An error occurred");
+        console.log(error);
+      }
     },
-    [updateRover]
+    [updateRover, selectedFile]
   );
 
   return (
@@ -143,13 +188,27 @@ export default function EditRoverDialog({
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Rover Image</FormLabel>
                     <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/rover.jpg"
-                        {...field}
-                      />
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full"
+                          />
+                        </div>
+                        {(previewUrl || field.value) && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                            <img
+                              src={previewUrl || field.value}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -165,7 +224,7 @@ export default function EditRoverDialog({
                     <FormControl>
                       <Input
                         className="w-full"
-                        placeholder="https://example.com/rover.jpg"
+                        placeholder="Current Status"
                         {...field}
                       />
                     </FormControl>
@@ -173,6 +232,7 @@ export default function EditRoverDialog({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="description"
@@ -232,6 +292,7 @@ export default function EditRoverDialog({
                   />
                 </div>
               </div>
+
               <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
                 <div className="flex-1">
                   <FormField
@@ -243,7 +304,7 @@ export default function EditRoverDialog({
                         <FormControl>
                           <Input
                             className="w-full"
-                            placeholder="25 kg"
+                            placeholder="30cm adolf"
                             {...field}
                           />
                         </FormControl>
@@ -263,7 +324,7 @@ export default function EditRoverDialog({
                         <FormControl>
                           <Input
                             className="w-full"
-                            placeholder="100W Solar"
+                            placeholder="1.1m x 1.2m"
                             {...field}
                           />
                         </FormControl>

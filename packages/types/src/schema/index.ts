@@ -63,7 +63,7 @@ export const CreateCompetitionSchema = z.object({
   location: z.string(),
   roverId: z.string().uuid(),
   result: z.string(),
-  featured: z.boolean(),
+  featured: z.boolean().optional(),
   image: z.string(),
   iconColor: z.string(),
   iconBg: z.string(),

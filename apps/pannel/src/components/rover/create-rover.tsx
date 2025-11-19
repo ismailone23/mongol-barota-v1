@@ -20,18 +20,21 @@ import {
 } from "@workspace/ui/components/form";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { Textarea } from "@workspace/ui/components/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Upload } from "lucide-react";
+import { uploadImage } from "@/utils";
+import { Textarea } from "@workspace/ui/components/textarea";
 
 type FormValues = z.infer<typeof CreateRoverSchema>;
 
 export default function CreateRoverDialog({ refetch }: { refetch: any }) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const createRover = useMutation(
     trpc.competition.createRover.mutationOptions({
@@ -43,6 +46,8 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
         toast.success("Rover Added", { id: ctx.toastId });
         refetch();
         form.reset();
+        setSelectedFile(null);
+        setPreviewUrl("");
         setOpen(false);
       },
       onError: (error, _vars, ctx) => {
@@ -76,11 +81,48 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
     },
   });
 
-  const onSubmit = useCallback(
-    (values: FormValues) => {
-      createRover.mutate(values);
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
     },
-    [createRover]
+    []
+  );
+
+  const onSubmit = useCallback(
+    async (values: FormValues) => {
+      try {
+        let imageUrl = values.image;
+
+        if (selectedFile) {
+          const uploadToastId = toast.loading("Uploading image...");
+          try {
+            imageUrl = await uploadImage(selectedFile);
+            toast.success("Image uploaded", { id: uploadToastId });
+          } catch (error) {
+            toast.error(`Failed to upload image: ${error}`, {
+              id: uploadToastId,
+            });
+            return;
+          }
+        }
+
+        // Mutate with the uploaded image URL
+        createRover.mutate({
+          ...values,
+          image: imageUrl,
+        });
+      } catch (error) {
+        toast.error("An error occurred");
+        console.log(error);
+      }
+    },
+    [createRover, selectedFile]
   );
 
   return (
@@ -117,53 +159,105 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
-                name="image"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/rover.jpg"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Image URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/rover.jpg"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         className="w-full"
-                        placeholder="Current Status"
+                        placeholder="Mars Explorer"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rover Image</FormLabel>
+                    <FormControl>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full"
+                          />
+                        </div>
+                        {previewUrl && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                            <img
+                              src={previewUrl}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="Current Status"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="spec.autonomy"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Autonomy</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="Autonmated vision..."
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <FormField
+                control={form.control}
+                name="spec.communications"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Communications</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="Autonmated vision..."
                         {...field}
                       />
                     </FormControl>
@@ -254,23 +348,6 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                   />
                 </div>
               </div>
-              <FormField
-                control={form.control}
-                name="spec.autonomy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Autonomy</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="Autonmated vision..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <FormField
                 control={form.control}

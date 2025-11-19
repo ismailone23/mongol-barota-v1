@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
+import { uploadImage } from "@/utils";
 
 type FormValues = z.infer<typeof UpdateSponsorSchema>;
 
@@ -49,6 +50,8 @@ export default function EditSponsorDialog({
 }: EditSponsorDialogProps) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   // Fetch plans and competitions for dropdowns
   const { data: plans } = useQuery(trpc.team.getPlans.queryOptions());
@@ -66,6 +69,8 @@ export default function EditSponsorDialog({
         toast.success("Sponsor Updated", { id: ctx.toastId });
         refetch();
         setOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl("");
       },
       onError: (error, _vars, ctx) => {
         toast.error("Failed to update sponsor", {
@@ -100,11 +105,47 @@ export default function EditSponsorDialog({
       plan: sponsor.plan.id,
       competitionId: sponsor.competition.id,
     });
+    setSelectedFile(null);
+    setPreviewUrl("");
   }, [sponsor, form]);
-
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
+    },
+    []
+  );
   const onSubmit = useCallback(
-    (values: FormValues) => {
-      updateSponsor.mutate(values);
+    async (values: FormValues) => {
+      try {
+        let imageUrl = values.logo;
+
+        // Only upload if a new file was selected
+        if (selectedFile) {
+          const uploadToastId = toast.loading("Uploading image...");
+          try {
+            imageUrl = await uploadImage(selectedFile);
+            toast.success("Image uploaded", { id: uploadToastId });
+          } catch (error) {
+            toast.error("Failed to upload image", { id: uploadToastId });
+            return;
+          }
+        }
+
+        // Update with the new image URL (or keep the old one)
+        updateSponsor.mutate({
+          ...values,
+          logo: imageUrl,
+        });
+      } catch (error) {
+        toast.error("An error occurred");
+        console.log(error);
+      }
     },
     [updateSponsor]
   );
@@ -185,13 +226,27 @@ export default function EditSponsorDialog({
                 name="logo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company Logo URL</FormLabel>
+                    <FormLabel>Company logo</FormLabel>
                     <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/logo.png"
-                        {...field}
-                      />
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full"
+                          />
+                        </div>
+                        {(previewUrl || field.value) && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                            <img
+                              src={previewUrl || field.value}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

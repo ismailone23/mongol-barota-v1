@@ -106,17 +106,7 @@ export default function CompetitionTable({
                 <TableCell>
                   {new Date(competition.year).getFullYear()}
                 </TableCell>
-                <TableCell>
-                  <span
-                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                    style={{
-                      backgroundColor: competition.iconBg,
-                      color: competition.iconColor,
-                    }}
-                  >
-                    {competition.result}
-                  </span>
-                </TableCell>
+                <TableCell>{competition.result}</TableCell>
                 <TableCell>
                   {competition.featured && (
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />

@@ -37,6 +37,7 @@ import { useTRPC } from "@/trpc/react";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 import { MemberInsert } from "@workspace/db/schema";
+import { uploadImage } from "@/utils";
 
 type FormValues = z.infer<typeof UpdateMemberSchema>;
 
@@ -53,6 +54,8 @@ export default function EditMemberDialog({
 }: EditMemberDialogProps) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const updateMember = useMutation(
     trpc.team.updateMember.mutationOptions({
@@ -64,6 +67,8 @@ export default function EditMemberDialog({
         toast.success("Member Updated", { id: ctx.toastId });
         refetch();
         setOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl("");
       },
       onError: (error, _vars, ctx) => {
         toast.error("Failed to update member", {
@@ -82,6 +87,7 @@ export default function EditMemberDialog({
       image: member.image,
       title: member.title || "",
       department: member.department,
+      role: member.role,
       subTeam: member.subTeam,
       about: member.about || "",
       bio: member.bio || "",
@@ -104,6 +110,7 @@ export default function EditMemberDialog({
       department: member.department,
       subTeam: member.subTeam,
       about: member.about || "",
+      role: member.role,
       bio: member.bio || "",
       email: member.email || "",
       phone: member.phone || "",
@@ -112,11 +119,49 @@ export default function EditMemberDialog({
       joined: member.joined || undefined,
       left: member.left || undefined,
     });
+    setSelectedFile(null);
+    setPreviewUrl("");
   }, [member, form]);
 
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
+    },
+    []
+  );
+
   const onSubmit = useCallback(
-    (values: FormValues) => {
-      updateMember.mutate(values);
+    async (values: FormValues) => {
+      try {
+        let imageUrl = values.image;
+
+        // Only upload if a new file was selected
+        if (selectedFile) {
+          const uploadToastId = toast.loading("Uploading image...");
+          try {
+            imageUrl = await uploadImage(selectedFile);
+            toast.success("Image uploaded", { id: uploadToastId });
+          } catch (error) {
+            toast.error("Failed to upload image", { id: uploadToastId });
+            return;
+          }
+        }
+
+        // Update with the new image URL (or keep the old one)
+        updateMember.mutate({
+          ...values,
+          image: imageUrl,
+        });
+      } catch (error) {
+        toast.error("An error occurred");
+        console.log(error);
+      }
     },
     [updateMember]
   );
@@ -139,41 +184,44 @@ export default function EditMemberDialog({
               className="space-y-6 w-full max-w-full"
             >
               <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="w-full"
-                          placeholder="John Doe"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>title</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="w-full"
-                          placeholder="Team Lead | Team Leader"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="John Doe"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>title</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="w-full"
+                            placeholder="Team Lead | Team Leader"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <FormField
@@ -181,13 +229,27 @@ export default function EditMemberDialog({
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Competition Image</FormLabel>
                     <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/image.jpg"
-                        {...field}
-                      />
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full"
+                          />
+                        </div>
+                        {(previewUrl || field.value) && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                            <img
+                              src={previewUrl || field.value}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -98,4 +98,17 @@ export const authRoute = createTRPCRouter({
   allUsers: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.select().from(users).orderBy(asc(users.emailVerified));
   }),
+  isActualUser: publicProcedure
+    .input(z.object({ email: z.string().optional().nullable() }))
+    .query(async ({ ctx, input }) => {
+      if (!input.email) {
+        return { isUser: false };
+      }
+      const [exists] = await ctx.db
+        .select()
+        .from(users)
+        .where(eq(users.email, input.email));
+      if (!exists) return { isUser: false };
+      return { isUser: true };
+    }),
 });

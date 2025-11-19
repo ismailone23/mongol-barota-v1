@@ -41,12 +41,15 @@ import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { competitionIcons, tailwindColors } from "@/constants/route";
+import { uploadImage } from "@/utils";
 
 type FormValues = z.input<typeof CreateCompetitionSchema>;
 
 export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   // Fetch rovers for the select dropdown
   const { data: rovers, isLoading: roversLoading } = useQuery(
@@ -69,6 +72,8 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
         refetch();
         form.reset();
         setOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl("");
       },
       onError: (error, _vars, ctx) => {
         toast.error("Failed to add competition", {
@@ -88,6 +93,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
       location: "",
       roverId: "",
       result: "",
+      featured: undefined,
       image: "",
       iconColor: "#84cc16",
       iconBg: "#fff",
@@ -96,10 +102,45 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
       teamMemberIds: [],
     },
   });
-
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      }
+    },
+    []
+  );
   const onSubmit = useCallback(
-    (values: FormValues) => {
-      createCompetition.mutate(values);
+    async (values: FormValues) => {
+      try {
+        let imageUrl = values.image;
+
+        if (selectedFile) {
+          const uploadToastId = toast.loading("Uploading image...");
+          try {
+            imageUrl = await uploadImage(selectedFile);
+            toast.success("Image uploaded", { id: uploadToastId });
+          } catch (error) {
+            toast.error(`Failed to upload image: ${error}`, {
+              id: uploadToastId,
+            });
+            return;
+          }
+        }
+
+        // Mutate with the uploaded image URL
+        createCompetition.mutate({
+          ...values,
+          image: imageUrl,
+        });
+      } catch (error) {
+        toast.error("An error occurred");
+        console.log(error);
+      }
     },
     [createCompetition]
   );
@@ -166,7 +207,37 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Competition Image</FormLabel>
+                    <FormControl>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="w-full"
+                          />
+                        </div>
+                        {previewUrl && (
+                          <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                            <img
+                              src={previewUrl}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="description"
@@ -352,24 +423,6 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Image URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="https://example.com/competition.jpg"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="icon"
                 render={({ field }) => (
                   <FormItem>
@@ -543,7 +596,7 @@ export default function CreateCompetitionDialog({ refetch }: { refetch: any }) {
                   Cancel
                 </Button>
                 <Button className="cursor-pointer" type="submit">
-                  Update Competition
+                  Create Competition
                 </Button>
               </div>
             </form>

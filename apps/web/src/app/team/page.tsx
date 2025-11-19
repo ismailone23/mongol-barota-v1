@@ -467,9 +467,9 @@ export default function TeamPage() {
                       </div>
                       <div className="space-y-2 text-center">
                         <h3 className="font-semibold text-base">
-                          {advisor.title}
-                          {advisor.name}
+                          {advisor.title} {advisor.name}
                         </h3>
+
                         <Badge
                           variant="outline"
                           className="text-xs px-3 py-1 rounded-full"
@@ -481,9 +481,6 @@ export default function TeamPage() {
                             {advisor.about}
                           </div>
                         )}
-                        <div className="text-xs text-muted-foreground">
-                          {advisor.department}
-                        </div>
                         <p className="text-sm text-muted-foreground leading-relaxed">
                           {advisor.bio}
                         </p>

@@ -143,9 +143,9 @@ export default function RoverTable({
                 <TableCell>{rover.spec.autonomy}</TableCell>
                 <TableCell>
                   <div className="text-sm flex ">
-                    <div>{new Date(rover.year).getFullYear()}</div>-
+                    <div>{new Date(rover.year).getFullYear()}</div>
                     {rover.ended && (
-                      <div>{new Date(rover.ended).getFullYear()}</div>
+                      <div>-{new Date(rover.ended).getFullYear()}</div>
                     )}
                   </div>
                 </TableCell>

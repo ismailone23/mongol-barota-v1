@@ -1,4 +1,4 @@
-import { authRoute, competitionRoute, teamRoute } from "./routes";
+import { authRoute, competitionRoute, contactRoute, teamRoute } from "./routes";
 import { createTRPCRouter, publicProcedure } from "./trpc";
 
 export const appRouter = createTRPCRouter({
@@ -8,6 +8,7 @@ export const appRouter = createTRPCRouter({
   auth: authRoute,
   competition: competitionRoute,
   team: teamRoute,
+  contact: contactRoute,
 });
 
 // export type definition of API

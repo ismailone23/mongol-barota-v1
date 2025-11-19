@@ -9,6 +9,15 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@workspace/ui/components/form";
+import {
   ArrowRight,
   Building,
   CheckCircle2,
@@ -23,7 +32,14 @@ import {
   Youtube,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useTRPC } from "@/trpc/react";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { ContactSchema } from "@workspace/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const contactInfo = [
   {
@@ -110,30 +126,47 @@ const heroHighlights = [
   },
 ];
 
+type FormValues = z.infer<typeof ContactSchema>;
+
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    organization: "",
-    subject: "",
-    message: "",
+  const trpc = useTRPC();
+  const api = useMutation(
+    trpc.contact.send.mutationOptions({
+      onMutate: () => {
+        const toastId = toast.loading("Sending message...");
+        return { toastId };
+      },
+      onSuccess: async (_data, _vars, ctx) => {
+        toast.success(
+          "Message Sent. A representative from us will contact you soon.",
+          { id: ctx.toastId }
+        );
+        form.reset();
+      },
+      onError: (error, _vars, ctx) => {
+        toast.error("Failed to sent message", {
+          description: error.message,
+          id: ctx?.toastId,
+        });
+      },
+    })
+  );
+  const form = useForm<FormValues>({
+    resolver: zodResolver(ContactSchema),
+    defaultValues: {
+      email: "",
+      subject: "",
+      name: "",
+      organization: "",
+      message: "",
+    },
   });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
+  const onSubmit = useCallback(
+    (values: FormValues) => {
+      api.mutate(values);
+    },
+    [api]
+  );
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -245,90 +278,130 @@ export default function ContactPage() {
               </div>
               <Card className="border-primary/10 shadow-lg shadow-primary/5">
                 <CardContent className="p-8">
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name *</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
-                          placeholder="Your full name"
-                        />
+                  <Form {...form}>
+                    <form
+                      id="send-message"
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-6 w-full max-w-full"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                        <div className="flex-1">
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Full Name*</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="w-full"
+                                    placeholder="Your full name"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email*</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="w-full"
+                                    placeholder="placeholder@example.com"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
-                          placeholder="your.email@example.com"
-                        />
+                      <div className="flex flex-col sm:flex-row sm:space-x-4 w-full gap-4 sm:gap-0">
+                        <div className="flex-1">
+                          <FormField
+                            control={form.control}
+                            name="organization"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Organization</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="w-full"
+                                    placeholder="Your Company or institutee"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <FormField
+                            control={form.control}
+                            name="subject"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Subject*</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className="w-full"
+                                    placeholder="Sponsor ship, media..."
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="organization">
-                          Organization (Optional)
-                        </Label>
-                        <Input
-                          id="organization"
-                          name="organization"
-                          value={formData.organization}
-                          onChange={handleChange}
-                          placeholder="Your company or institution"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="subject">Subject *</Label>
-                        <Input
-                          id="subject"
-                          name="subject"
-                          value={formData.subject}
-                          onChange={handleChange}
-                          required
-                          placeholder="Sponsorship, media, recruitment..."
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
+                      <FormField
+                        control={form.control}
                         name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                        rows={6}
-                        placeholder="Tell us more about your inquiry, timeline, or collaboration goals."
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Message*</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                className="w-full"
+                                placeholder="Tell us about your inquiry..."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
 
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-xs text-muted-foreground">
-                        By submitting, you agree to let us reach out over email
-                        or phone to follow up on your request.
-                      </p>
-                      <Button type="submit" className="w-full sm:w-auto">
-                        Send Message
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </form>
+                      <div className="w-full items-center justify-end flex gap-2">
+                        <p className="text-sm">
+                          By submitting, you agree to let us reach out over
+                          email or phone to follow up on your request.
+                        </p>
+                        <Button className="cursor-pointer" type="submit">
+                          Send Message
+                          <ArrowRight className="w-4" />
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
                 </CardContent>
               </Card>
             </div>
 
             {/* Contact Information */}
             <div className="space-y-6">
-              <Card className="bg-gradient-to-br from-primary/15 to-primary/5 border-primary/20">
+              <Card className="bg-linear-to-br from-primary/15 to-primary/5 border-primary/20">
                 <CardContent className="p-8 space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold">
@@ -454,7 +527,7 @@ export default function ContactPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-2">
-            <Card className="border-primary/10 bg-gradient-to-br from-primary/10 to-background">
+            <Card className="border-primary/10 bg-linear-to-br from-primary/10 to-background">
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-bold">Stay in the loop</h2>
@@ -547,7 +620,7 @@ export default function ContactPage() {
       {/* Sponsor CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <Card className="max-w-5xl mx-auto border-primary/20 bg-gradient-to-br from-primary/12 via-background to-secondary/10">
+          <Card className="max-w-5xl mx-auto border-primary/20 bg-linear-to-br from-primary/12 via-background to-secondary/10">
             <CardContent className="p-12">
               <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] items-center">
                 <div className="space-y-6">

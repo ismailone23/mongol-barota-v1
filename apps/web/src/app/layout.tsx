@@ -8,6 +8,8 @@ import type { Metadata } from "next";
 import type React from "react";
 import { Suspense } from "react";
 import { TRPCReactProvider } from "@/trpc/react";
+import { Toaster } from "@workspace/ui/components/sonner";
+
 // @ts-ignore
 import "@workspace/ui/globals.css";
 import { constructMetadata } from "@/lib/construct-metadata";
@@ -33,7 +35,10 @@ export default function RootLayout({
           <TRPCReactProvider>
             <Suspense fallback={<div>Loading...</div>}>
               <Navigation />
-              <main className="min-h-screen">{children}</main>
+              <main className="min-h-screen">
+                {children}
+                <Toaster />
+              </main>
               <Footer />
               <Analytics />
             </Suspense>

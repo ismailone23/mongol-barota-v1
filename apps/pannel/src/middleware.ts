@@ -1,11 +1,17 @@
 import { auth } from "@workspace/auth";
 import { NextResponse } from "next/server";
-import { authRoutes } from "./constants/route";
+import { authRoutes, apiAuthPrefixs } from "./constants/route";
 
 export default auth(async (req) => {
   const pathname = req.nextUrl.pathname;
   const isLoggedIn = !!req.auth;
   const isAuthRoute = authRoutes.includes(pathname);
+  const isApiAuthRoute = pathname.startsWith(apiAuthPrefixs);
+
+  // Always allow NextAuth API routes through
+  if (isApiAuthRoute) {
+    return NextResponse.next();
+  }
 
   // If logged in and trying to access auth pages, redirect to home
   if (isLoggedIn && isAuthRoute) {

@@ -14,7 +14,7 @@ import Image from "next/image";
 import { RoversSelect } from "@workspace/db/schema";
 import { Card } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
-import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 const getStatusIcon = (status: string) => {
   switch (status) {
     case "Active":
@@ -38,8 +38,24 @@ export default function Rover({
 }) {
   if (isLoading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-12">
+            {Array.from({ length: 2 }).map((_, idx) => (
+              <Card key={idx} className="overflow-hidden">
+                <div className="grid lg:grid-cols-2 gap-0">
+                  <Skeleton className="aspect-video lg:aspect-square w-full" />
+                  <div className="p-8 lg:p-12 space-y-4">
+                    <Skeleton className="h-10 w-2/3" />
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-5 w-5/6" />
+                    <Skeleton className="h-10 w-40" />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

@@ -2,7 +2,7 @@ import { Sponsors } from "@workspace/db/schema";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,7 +31,13 @@ export default function PrevSponser({
 
         <div className="max-w-2xl mx-auto">
           {isLoading ? (
-            <LoadingSpinner />
+            <Card className="text-center mb-8">
+              <CardContent className="p-8 space-y-4">
+                <Skeleton className="h-20 w-40 mx-auto" />
+                <Skeleton className="h-5 w-2/3 mx-auto" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
           ) : !previousSponsors || previousSponsors.length < 1 ? (
             <div>
               <p>No data</p>
@@ -57,7 +63,7 @@ export default function PrevSponser({
                   </Badge>
                   <h3 className="font-semibold mb-3">{sponsor.name}</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {sponsor.desctiption}
+                    {sponsor.description}
                   </p>
                   <Button asChild variant="ghost" size="sm">
                     <Link

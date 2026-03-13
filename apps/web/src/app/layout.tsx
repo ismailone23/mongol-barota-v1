@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import type React from "react";
 import { Suspense } from "react";
 import { TRPCReactProvider } from "@/trpc/react";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Toaster } from "@workspace/ui/components/sonner";
 
 // @ts-ignore
@@ -33,7 +34,25 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TRPCReactProvider>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense
+              fallback={
+                <div className="container mx-auto px-4 py-10 space-y-6">
+                  <Skeleton className="h-10 w-52" />
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-xl border p-4 space-y-3"
+                      >
+                        <Skeleton className="h-36 w-full" />
+                        <Skeleton className="h-5 w-2/3" />
+                        <Skeleton className="h-4 w-full" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              }
+            >
               <Navigation />
               <main className="min-h-screen">
                 {children}

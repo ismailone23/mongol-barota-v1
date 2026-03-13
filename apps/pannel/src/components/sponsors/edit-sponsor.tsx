@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateSponsorSchema } from "@workspace/types";
+import { UpdateSponsorSchema } from "@workspace/types";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -19,6 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/react";
+import { toast } from "sonner";
+import { useCallback, useEffect, useState } from "react";
+import { SponsorWithRelation } from "./sponsor-table";
 import {
   Select,
   SelectContent,
@@ -26,52 +33,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useTRPC } from "@/trpc/react";
-import { toast } from "sonner";
-import { useCallback, useState } from "react";
 import { uploadImage } from "@/utils";
 
-type FormValues = z.infer<typeof CreateSponsorSchema>;
+type FormValues = z.infer<typeof UpdateSponsorSchema>;
 
-export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
+interface EditSponsorDialogProps {
+  sponsor: SponsorWithRelation;
+  trigger?: React.ReactNode;
+  refetch: any;
+}
+
+export default function EditSponsorDialog({
+  refetch,
+  sponsor,
+  trigger,
+}: EditSponsorDialogProps) {
   const trpc = useTRPC();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+
   // Fetch plans and competitions for dropdowns
-  const { data: plans, isLoading: plansLoading } = useQuery(
-    trpc.team.getPlans.queryOptions()
-  );
-  const { data: competitions, isLoading: competitionsLoading } = useQuery(
-    trpc.competition.getCompetitions.queryOptions()
+  const { data: plans } = useQuery(trpc.team.getPlans.queryOptions());
+  const { data: competitions } = useQuery(
+    trpc.competition.getCompetitions.queryOptions(),
   );
 
-  const createSponsor = useMutation(
-    trpc.team.createSponsor.mutationOptions({
+  const updateSponsor = useMutation(
+    trpc.team.updateSponsor.mutationOptions({
       onMutate: () => {
-        const toastId = toast.loading("Adding Sponsor...");
+        const toastId = toast.loading("Updating sponsor...");
         return { toastId };
       },
-      onSuccess: async (_data, _vars, ctx) => {
-        toast.success("Sponsor Added", { id: ctx.toastId });
+      onSuccess: (_data, _vars, ctx) => {
+        toast.success("Sponsor Updated", { id: ctx.toastId });
         refetch();
-        form.reset();
         setOpen(false);
         setSelectedFile(null);
         setPreviewUrl("");
       },
       onError: (error, _vars, ctx) => {
-        toast.error("Failed to add sponsor", {
+        toast.error("Failed to update sponsor", {
           description: error.message,
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(UpdateSponsorSchema),
+    defaultValues: {
+      id: sponsor.sponsor.id,
+      name: sponsor.sponsor.name,
+      description: sponsor.sponsor.description || "",
+      website: sponsor.sponsor.website || "",
+      logo: sponsor.sponsor.logo,
+      plan: sponsor.plan.id,
+      competitionId: sponsor.competition?.id ?? undefined,
+    },
+  });
+
+  // Reset form when sponsor prop changes
+  useEffect(() => {
+    form.reset({
+      id: sponsor.sponsor.id,
+      name: sponsor.sponsor.name,
+      description: sponsor.sponsor.description || "",
+      website: sponsor.sponsor.website || "",
+      logo: sponsor.sponsor.logo,
+      plan: sponsor.plan.id,
+      competitionId: sponsor.competition?.id ?? undefined,
+    });
+    setSelectedFile(null);
+    setPreviewUrl("");
+  }, [sponsor, form]);
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -82,26 +118,14 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
         setPreviewUrl(url);
       }
     },
-    []
+    [],
   );
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(CreateSponsorSchema),
-    defaultValues: {
-      name: "",
-      desctiption: "",
-      website: "",
-      logo: "",
-      plan: "",
-      competitionId: undefined,
-    },
-  });
-
   const onSubmit = useCallback(
     async (values: FormValues) => {
       try {
         let imageUrl = values.logo;
 
+        // Only upload if a new file was selected
         if (selectedFile) {
           const uploadToastId = toast.loading("Uploading image...");
           try {
@@ -113,8 +137,8 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
           }
         }
 
-        // Mutate with the uploaded image URL
-        createSponsor.mutate({
+        // Update with the new image URL (or keep the old one)
+        updateSponsor.mutate({
           ...values,
           logo: imageUrl,
         });
@@ -123,23 +147,23 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
         console.log(error);
       }
     },
-    [createSponsor]
+    [updateSponsor],
   );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Sponsor</Button>
+        {trigger || <Button variant="outline">Edit</Button>}
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-full sm:max-w-[640px] md:max-w-[760px] max-h-[80vh] overflow-y-auto">
         <div>
           <DialogHeader className="mb-5">
-            <DialogTitle>New Sponsor</DialogTitle>
+            <DialogTitle>Edit Sponsor</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
-              id="create-sponsor-form"
+              id="edit-sponsor-form"
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6 w-full max-w-full"
             >
@@ -163,15 +187,14 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
 
               <FormField
                 control={form.control}
-                name="desctiption"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Description</FormLabel>
                     <FormControl>
                       <Textarea
                         className="w-full"
-                        placeholder="Describe the sponsor company and their mission..."
-                        rows={4}
+                        placeholder="Describe the sponsor company..."
                         {...field}
                       />
                     </FormControl>
@@ -190,7 +213,6 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
                       <Input
                         className="w-full"
                         placeholder="https://www.example.com"
-                        type="url"
                         {...field}
                       />
                     </FormControl>
@@ -215,10 +237,10 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
                             className="w-full"
                           />
                         </div>
-                        {previewUrl && (
+                        {(previewUrl || field.value) && (
                           <div className="relative w-full h-48 rounded-lg overflow-hidden border">
                             <img
-                              src={previewUrl}
+                              src={previewUrl || field.value}
                               alt="Preview"
                               className="w-full h-full object-cover"
                             />
@@ -243,25 +265,15 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a sponsorship plan" />
+                          <SelectValue placeholder="Select a plan" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {plansLoading ? (
-                          <SelectItem value="loading" disabled>
-                            Loading plans...
+                        {plans?.map((plan) => (
+                          <SelectItem key={plan.id} value={plan.id}>
+                            {plan.name}
                           </SelectItem>
-                        ) : plans && plans.length > 0 ? (
-                          plans.map((plan) => (
-                            <SelectItem key={plan.id} value={plan.id}>
-                              {plan.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-plans" disabled>
-                            No plans available
-                          </SelectItem>
-                        )}
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -281,28 +293,18 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a competition (optional)" />
+                          <SelectValue placeholder="Select a competition" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {competitionsLoading ? (
-                          <SelectItem value="loading" disabled>
-                            Loading competitions...
+                        {competitions?.map((competition) => (
+                          <SelectItem
+                            key={competition.id}
+                            value={competition.id}
+                          >
+                            {competition.name}
                           </SelectItem>
-                        ) : competitions && competitions.length > 0 ? (
-                          competitions.map((competition) => (
-                            <SelectItem
-                              key={competition.id}
-                              value={competition.id}
-                            >
-                              {competition.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-competitions" disabled>
-                            No competitions available
-                          </SelectItem>
-                        )}
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -318,12 +320,8 @@ export default function CreateSponsorDialog({ refetch }: { refetch: any }) {
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="cursor-pointer"
-                  type="submit"
-                  disabled={createSponsor.isPending}
-                >
-                  {createSponsor.isPending ? "Creating..." : "Create Sponsor"}
+                <Button className="cursor-pointer" type="submit">
+                  Update Sponsor
                 </Button>
               </div>
             </form>

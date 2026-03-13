@@ -124,7 +124,7 @@ export default function SignupForm() {
       <CardFooter className="flex-col gap-2">
         <Link
           href={"/auth/login"}
-          className="hover:text-blue-500 hover:underline"
+          className="text-sm text-muted-foreground hover:text-primary hover:underline"
         >
           Already have an account? Login
         </Link>

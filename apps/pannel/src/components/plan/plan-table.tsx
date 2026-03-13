@@ -45,7 +45,7 @@ export default function PlanTable({
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
   const deletePlanCallback = useCallback(
@@ -54,83 +54,94 @@ export default function PlanTable({
         deletePlan.mutate({ id: plan.id });
       }
     },
-    [deletePlan]
+    [deletePlan],
   );
 
   return (
-    <div className="border border-gray-200 overflow-hidden rounded-lg">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Plan Name</TableHead>
-            <TableHead>Subtitle</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Popular</TableHead>
-            <TableHead>Order</TableHead>
-            <TableHead>Benefits</TableHead>
+            <TableHead className="hidden sm:table-cell">Price</TableHead>
+            <TableHead className="hidden md:table-cell">Status</TableHead>
+            <TableHead className="hidden md:table-cell">Popular</TableHead>
+            <TableHead className="hidden lg:table-cell">Order</TableHead>
+            <TableHead className="hidden lg:table-cell">Benefits</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center h-24">
-                Loading.....
+              <TableCell
+                colSpan={7}
+                className="text-center h-24 text-muted-foreground"
+              >
+                Loading...
               </TableCell>
             </TableRow>
           ) : !plans || plans.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center h-24">
+              <TableCell
+                colSpan={7}
+                className="text-center h-24 text-muted-foreground"
+              >
                 No plans found
               </TableCell>
             </TableRow>
           ) : (
             plans.map((plan) => (
               <TableRow key={plan.id}>
-                <TableCell className="font-medium">{plan.name}</TableCell>
-                <TableCell>
-                  {plan.subtitle || (
-                    <span className="text-gray-400 text-sm">No subtitle</span>
+                <TableCell className="font-medium">
+                  <div>{plan.name}</div>
+                  {plan.subtitle && (
+                    <div className="text-xs text-muted-foreground">
+                      {plan.subtitle}
+                    </div>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-semibold">
                     ${plan.price.toLocaleString()}
                   </div>
                   {plan.priceLabel && (
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground">
                       {plan.priceLabel}
                     </div>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   <Badge variant={plan.isActive ? "default" : "secondary"}>
                     {plan.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   {plan.isPopular && (
                     <Badge variant="destructive">Popular</Badge>
                   )}
                 </TableCell>
-                <TableCell>{plan.displayOrder}</TableCell>
-                <TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  {plan.displayOrder}
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
                   <div className="flex flex-col gap-1 max-w-xs">
                     {plan.benefits && plan.benefits.length > 0 ? (
                       plan.benefits.slice(0, 2).map((benefit, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700"
+                          className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-xs"
                         >
                           {benefit}
                         </span>
                       ))
                     ) : (
-                      <span className="text-gray-400 text-xs">No benefits</span>
+                      <span className="text-muted-foreground text-xs">
+                        None
+                      </span>
                     )}
                     {plan.benefits && plan.benefits.length > 2 && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         +{plan.benefits.length - 2} more
                       </span>
                     )}
@@ -142,16 +153,16 @@ export default function PlanTable({
                       refetch={refetch}
                       plan={plan}
                       trigger={
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="icon">
                           <Pencil className="w-4 h-4" />
                         </Button>
                       }
                     />
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
                       onClick={() => deletePlanCallback(plan)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

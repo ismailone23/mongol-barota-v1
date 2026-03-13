@@ -66,7 +66,7 @@ export default function EditRoverDialog({
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
   const form = useForm<FormValues>({
@@ -113,7 +113,7 @@ export default function EditRoverDialog({
         setPreviewUrl(url);
       }
     },
-    []
+    [],
   );
 
   const onSubmit = useCallback(
@@ -145,7 +145,7 @@ export default function EditRoverDialog({
         console.log(error);
       }
     },
-    [updateRover, selectedFile]
+    [updateRover, selectedFile],
   );
 
   return (
@@ -304,7 +304,7 @@ export default function EditRoverDialog({
                         <FormControl>
                           <Input
                             className="w-full"
-                            placeholder="30cm adolf"
+                            placeholder="3-DOF"
                             {...field}
                           />
                         </FormControl>

@@ -9,7 +9,11 @@ import {
   Zap,
 } from "lucide-react";
 
-export const authRoutes = ["/auth/login", "/auth/signup"];
+export const authRoutes = [
+  "/auth/login",
+  "/auth/signup",
+  "/auth/forgot-password",
+];
 
 export const apiAuthPrefixs = "/api/auth";
 

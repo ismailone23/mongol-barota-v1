@@ -140,7 +140,7 @@ export function Navigation() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80">
+              <SheetContent side="right" className="w-80 overflow-y-auto">
                 <div className="flex flex-col space-y-4 mt-8">
                   {navigationItems.map((item, index) => {
                     const isActive =

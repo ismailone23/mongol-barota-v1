@@ -1,6 +1,7 @@
 {
   "extends": "@workspace/typescript-config/internal-package.json",
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "baseUrl": ".",
@@ -9,6 +10,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["."],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }

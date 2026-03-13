@@ -30,7 +30,7 @@ export type PlansInsert = typeof plans.$inferInsert;
 export const sponsors = pgTable("sponsors", (t) => ({
   id: t.uuid("id").notNull().defaultRandom().primaryKey().unique(),
   name: t.varchar("name").notNull(),
-  desctiption: t.text("desctiption").notNull(),
+  description: t.text("description").notNull(),
   website: t.text("website").notNull(),
   logo: t.text("logo").notNull(),
   plan: t
@@ -39,8 +39,7 @@ export const sponsors = pgTable("sponsors", (t) => ({
     .references(() => plans.id, { onDelete: "no action" }),
   competitionId: t
     .uuid("competition_id")
-    .notNull()
-    .references(() => competitions.id, { onDelete: "no action" }),
+    .references(() => competitions.id, { onDelete: "set null" }),
   createdAt: t
     .timestamp("created_at", { mode: "date", withTimezone: true })
     .defaultNow()
@@ -60,6 +59,6 @@ export const sponsorCompetitionRelation = relations(sponsors, ({ one }) => ({
   }),
 }));
 
-export const sponssrShipPlanRelation = relations(plans, ({ many }) => ({
+export const sponsorshipPlanRelation = relations(plans, ({ many }) => ({
   sponsors: many(sponsors),
 }));

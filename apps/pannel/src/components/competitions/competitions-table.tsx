@@ -2,17 +2,11 @@
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CompetitionsSelect } from "@workspace/db/schema";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table";
-import { Pencil, Trash2, Star } from "lucide-react";
-import React, { useCallback } from "react";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { Calendar, MapPin, Pencil, Star, Trash2, Trophy } from "lucide-react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import EditCompetitionDialog from "./edit-competition";
 
@@ -37,7 +31,7 @@ export default function CompetitionTable({
       onSuccess: (_data, _vars, ctx) => {
         toast.success("Competition Deleted", { id: ctx.toastId });
         void queryClient.invalidateQueries(
-          trpc.competition.getCompetitions.queryOptions()
+          trpc.competition.getCompetitions.queryOptions(),
         );
       },
       onError: (error, _vars, ctx) => {
@@ -46,7 +40,7 @@ export default function CompetitionTable({
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
   const deleteCompetitionCallback = useCallback(
@@ -57,83 +51,82 @@ export default function CompetitionTable({
         deleteCompetition.mutate({ id: competition.id });
       }
     },
-    [deleteCompetition]
+    [deleteCompetition],
   );
 
   return (
-    <div className="border border-gray-200 overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-20">Image</TableHead>
-            <TableHead>Competition Name</TableHead>
-            <TableHead>Region</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Year</TableHead>
-            <TableHead>Result</TableHead>
-            <TableHead>Featured</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={8} className="text-center h-24">
-                Loading.....
-              </TableCell>
-            </TableRow>
-          ) : !competitions || competitions.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={8} className="text-center h-24">
-                No competitions found
-              </TableCell>
-            </TableRow>
-          ) : (
-            competitions.map((competition) => (
-              <TableRow key={competition.id}>
-                <TableCell>
-                  <img
-                    src={competition.image}
-                    alt={competition.name}
-                    className="w-10 h-10 rounded object-cover"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  {competition.name}
-                </TableCell>
-                <TableCell>{competition.region}</TableCell>
-                <TableCell>{competition.location}</TableCell>
-                <TableCell>
-                  {new Date(competition.year).getFullYear()}
-                </TableCell>
-                <TableCell>{competition.result}</TableCell>
-                <TableCell>
+    <div className="rounded-md border p-4">
+      {isLoading ? (
+        <div className="h-24 flex items-center justify-center text-muted-foreground">
+          Loading...
+        </div>
+      ) : !competitions || competitions.length === 0 ? (
+        <div className="h-24 flex items-center justify-center text-muted-foreground">
+          No competitions found
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {competitions.map((competition) => (
+            <Card key={competition.id} className="overflow-hidden border-muted">
+              <img
+                src={competition.image}
+                alt={competition.name}
+                className="h-44 w-full object-cover"
+              />
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-semibold line-clamp-2">
+                    {competition.name}
+                  </p>
                   {competition.featured && (
-                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 shrink-0" />
                   )}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2 items-center">
-                    <EditCompetitionDialog
-                      refetch={refetch}
-                      competition={competition}
-                      trigger={<Pencil className="w-4 h-4" />}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteCompetitionCallback(competition)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">
+                    {competition.region.toUpperCase()}
+                  </Badge>
+                  <Badge variant="outline">
+                    {new Date(competition.year).getFullYear()}
+                  </Badge>
+                </div>
+
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  <p className="inline-flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span className="line-clamp-1">{competition.location}</span>
+                  </p>
+                  <p className="inline-flex items-center gap-2">
+                    <Trophy className="w-4 h-4" />
+                    <span className="line-clamp-1">{competition.result}</span>
+                  </p>
+                  <p className="inline-flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(competition.year).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-1 items-center">
+                  <EditCompetitionDialog
+                    refetch={refetch}
+                    competition={competition}
+                    trigger={<Pencil className="w-4 h-4" />}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteCompetitionCallback(competition)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import SponserTiers from "@/components/sponser-tiers";
+import SponsorTiers from "@/components/sponsor-tiers";
 import { useTRPC } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@workspace/ui/components/badge";
@@ -27,154 +27,67 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import PrevSponser from "../../components/prev-sponser";
+import PrevSponsor from "@/components/prev-sponsor";
+import { useMemo } from "react";
+import RenderIcon from "@/components/render-icon";
 
-// const sponsorshipTiers = [
-//   {
-//     name: "Title Sponsor",
-//     subtitle: "Platinum Partner",
-//     amount: "BDT 15,00,000",
-//     amountText: "BDT Fifteen Lacs Only",
-//     icon: Crown,
-//     color: "text-purple-600",
-//     bgColor: "bg-purple-100 dark:bg-purple-950",
-//     borderColor: "border-purple-200 dark:border-purple-800",
-//     popular: true,
-//     benefitCount: 12,
-//     benefits: [
-//       "Logo on main rover body (proportional)",
-//       "Corporate mention in print and media",
-//       "Company banner in particular events and venue",
-//       "Logo on posters and banners",
-//       "Advertisement at the start of the seminar",
-//       "Company stall in the venue (size on discussion)",
-//       "Promotional advertisement in the MM screen",
-//       "Logo on gift hampers and packages",
-//       "Logo on merchandise (non-commercial)",
-//       "Logo on merchandise (commercial)",
-//       "Brand/product value survey/analysis",
-//       "Advertisement on Digital Platforms, Social Media and event",
-//     ],
-//   },
-//   {
-//     name: "Gold Sponsor",
-//     subtitle: "Gold Partner",
-//     amount: "BDT 10,00,000",
-//     amountText: "BDT Ten Lacs Only",
-//     icon: Award,
-//     color: "text-yellow-600",
-//     bgColor: "bg-yellow-100 dark:bg-yellow-950",
-//     borderColor: "border-yellow-200 dark:border-yellow-800",
-//     benefitCount: 9,
-//     benefits: [
-//       "Logo on main rover body (proportional)",
-//       "Corporate mention in print and media",
-//       "Company banner in particular events and venue",
-//       "Logo on posters and banners",
-//       "Advertisement at the start of the seminar",
-//       "Logo on gift hampers and packages",
-//       "Logo on merchandise (non-commercial)",
-//       "Brand/product value survey/analysis",
-//       "Advertisement on Digital Platforms, Social Media and event",
-//     ],
-//   },
-//   {
-//     name: "Silver Sponsor",
-//     subtitle: "Silver Partner",
-//     amount: "BDT 5,00,000",
-//     amountText: "BDT Five Lacs Only",
-//     icon: Star,
-//     color: "text-gray-600",
-//     bgColor: "bg-gray-100 dark:bg-gray-900",
-//     borderColor: "border-gray-200 dark:border-gray-800",
-//     benefitCount: 6,
-//     benefits: [
-//       "Logo on main rover body (proportional)",
-//       "Corporate mention in print and media",
-//       "Logo on posters and banners",
-//       "Logo on gift hampers and packages",
-//       "Logo on merchandise (non-commercial)",
-//       "Advertisement on Digital Platforms, Social Media and event",
-//     ],
-//   },
-// ];
-
-// const previousSponsors = [
-//   {
-//     name: "Military Institute of Science and Technology",
-//     // tier: "Institutional Support",
-//     logo: "/mist.png",
-//     description: "Our home institution providing comprehensive support",
-//     website: "https://mist.ac.bd",
-//   },
-// ];
-
-// const budgetBreakdown = [
-//   { category: "Mechanical", amount: "BDT 4,87,400", percentage: 34.5 },
-//   { category: "Electrical", amount: "BDT 1,50,000", percentage: 10.6 },
-//   { category: "Software", amount: "BDT 2,00,000", percentage: 14.2 },
-//   { category: "Communication", amount: "BDT 1,80,000", percentage: 12.8 },
-//   { category: "Drone", amount: "BDT 1,64,000", percentage: 11.6 },
-//   { category: "Science", amount: "BDT 2,30,000", percentage: 16.3 },
-// ]
-
-const sponsorshipBenefits = [
+const fallbackBenefits = [
   {
-    icon: Building,
+    icon: "Building",
     title: "University Affiliation",
     description:
       "Align your brand with the next generation of leaders, pioneers, and innovators. Showcase your company as an active collaborator in shaping the future.",
   },
   {
-    icon: Globe,
+    icon: "Globe",
     title: "Brand Exposure",
     description:
       "Gain prominent visibility through logo placements on the rover, team uniforms, event materials, and digital platforms reaching international audiences.",
   },
   {
-    icon: Megaphone,
+    icon: "Megaphone",
     title: "Media Coverage",
     description:
       "Get exposure through national and international media channels when your logo is presented by Mongol Barota's Mars rover and merchandise.",
   },
   {
-    icon: Handshake,
+    icon: "Handshake",
     title: "Initiating New Partnerships",
     description:
       "Be at the forefront of industry-academy collaborations, creating opportunities for further partnerships and establishing presence as a partner for advancement.",
   },
   {
-    icon: TrendingUp,
+    icon: "TrendingUp",
     title: "Lead Generation",
     description:
       "Connect with MIST's growing student body, providing direct access to thousands of potential customers, interns, collaborators, and future employees.",
   },
   {
-    icon: Users,
+    icon: "Users",
     title: "Brand Community",
     description:
       "Build a powerful network of like-minded advocates who actively support and amplify your brand, evolving into devoted users and long-term allies.",
   },
   {
-    icon: Gift,
+    icon: "Gift",
     title: "Branded Gift Exposure",
     description:
       "Provide branded gifts for international participants, judges, organizers, and volunteers, creating lasting brand impressions across a global audience.",
   },
   {
-    icon: Target,
+    icon: "Target",
     title: "Long-term Legacy",
     description:
       "Build loyal customer base, convert potential leaders to brand ambassadors, and create partnerships with other organizations of the institution.",
   },
   {
-    icon: Lightbulb,
+    icon: "Lightbulb",
     title: "Exclusive Access",
     description:
       "Receive exclusive invitations to seminars, keynote events, and product showcases to speak at ceremonies and promote products/services.",
   },
   {
-    icon: BarChart,
+    icon: "BarChart",
     title: "Activation Opportunities",
     description:
       "Set up promotional booths during national events, facilitating direct product demonstrations, on-the-spot promotions, and targeted sales engagement.",
@@ -184,11 +97,25 @@ const sponsorshipBenefits = [
 export default function SponsorsPage() {
   const trpc = useTRPC();
   const { data: sponsorshipTiers, isLoading } = useQuery(
-    trpc.team.getPlans.queryOptions()
+    trpc.team.getPlans.queryOptions(),
   );
-  const { data: previousSponsors, isLoading: isSponserLoading } = useQuery(
-    trpc.team.getSponsors.queryOptions()
+  const { data: previousSponsors, isLoading: isSponsorLoading } = useQuery(
+    trpc.team.getSponsors.queryOptions(),
   );
+  const { data: dbBenefits } = useQuery(
+    trpc.content.getActiveContentItems.queryOptions({
+      section: "sponsorship_benefit",
+    }),
+  );
+
+  const sponsorshipBenefits = useMemo(() => {
+    if (!dbBenefits || dbBenefits.length === 0) return fallbackBenefits;
+    return dbBenefits.map((b) => ({
+      icon: b.icon ?? "Star",
+      title: b.title,
+      description: b.description ?? "",
+    }));
+  }, [dbBenefits]);
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -255,14 +182,12 @@ export default function SponsorsPage() {
         </div>
       </section>
 
-      {/* Previous Sponsors - Updated Section */}
-      <PrevSponser
+      <PrevSponsor
         previousSponsors={previousSponsors}
-        isLoading={isSponserLoading}
+        isLoading={isSponsorLoading}
       />
 
-      {/* Sponsorship Tiers */}
-      <SponserTiers isLoading={isLoading} sponsorshipTiers={sponsorshipTiers} />
+      <SponsorTiers isLoading={isLoading} sponsorshipTiers={sponsorshipTiers} />
 
       {/* Sponsorship Benefits */}
       <section className="py-20 bg-muted/30">
@@ -282,7 +207,10 @@ export default function SponsorsPage() {
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <benefit.icon className="w-6 h-6 text-primary" />
+                    <RenderIcon
+                      name={benefit.icon}
+                      className="w-6 h-6 text-primary"
+                    />
                   </div>
                   <h3 className="text-lg font-bold mb-3">{benefit.title}</h3>
                   <p className="text-sm text-muted-foreground">

@@ -6,7 +6,6 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
 import {
   Form,
@@ -15,33 +14,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@workspace/ui/components/form";
 import {
   ArrowRight,
   Building,
   CheckCircle2,
   Clock,
-  Facebook,
-  Instagram,
   Mail,
   MessageCircle,
   Phone,
   PhoneCall,
   User,
-  Youtube,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useTRPC } from "@/trpc/react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { ContactSchema } from "@workspace/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import RenderIcon from "@/components/render-icon";
 
-const contactInfo = [
+const fallbackContactInfo = [
   {
     category: "Team Leadership",
     contacts: [
@@ -90,46 +86,104 @@ const contactInfo = [
   },
 ];
 
-const socialLinks = [
+const fallbackSocialLinks = [
   {
     name: "Facebook",
     url: "https://www.facebook.com/mongolbarota.mist",
-    icon: Facebook,
+    icon: "Facebook",
     color: "text-blue-600",
   },
   {
     name: "Instagram",
     url: "https://www.instagram.com/mist_mongolbarota",
-    icon: Instagram,
+    icon: "Instagram",
     color: "text-pink-600",
   },
   {
     name: "YouTube",
     url: "https://www.youtube.com/@marsroverteammist9242",
-    icon: Youtube,
+    icon: "Youtube",
     color: "text-red-600",
   },
 ];
 
-const heroHighlights = [
-  {
-    label: "Response Window",
-    value: "24-48 Hours",
-  },
-  {
-    label: "Location",
-    value: "Mirpur Cantonment, Dhaka",
-  },
-  {
-    label: "Inquiries",
-    value: "Sponsorship, Media & Recruitment",
-  },
+const fallbackHeroHighlights = [
+  { label: "Response Window", value: "24-48 Hours" },
+  { label: "Location", value: "Mirpur Cantonment, Dhaka" },
+  { label: "Inquiries", value: "Sponsorship, Media & Recruitment" },
 ];
 
 type FormValues = z.infer<typeof ContactSchema>;
 
 export default function ContactPage() {
   const trpc = useTRPC();
+
+  const { data: dbContacts } = useQuery(
+    trpc.content.getActiveContentItems.queryOptions({
+      section: "contact_person",
+    }),
+  );
+
+  const { data: dbSocials } = useQuery(
+    trpc.content.getActiveContentItems.queryOptions({
+      section: "social_link",
+    }),
+  );
+
+  const { data: dbHighlights } = useQuery(
+    trpc.content.getActiveContentItems.queryOptions({
+      section: "hero_highlight",
+    }),
+  );
+
+  const contactInfo = useMemo(() => {
+    if (!dbContacts || dbContacts.length === 0) return fallbackContactInfo;
+    const grouped: Record<
+      string,
+      {
+        name: string;
+        role: string;
+        department: string;
+        email: string;
+        phone: string;
+      }[]
+    > = {};
+    for (const c of dbContacts) {
+      const cat = c.category || "Team";
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat]!.push({
+        name: c.title,
+        role: c.subtitle ?? "",
+        department: c.description ?? "",
+        email: c.email ?? "",
+        phone: c.phone ?? "",
+      });
+    }
+    return Object.entries(grouped).map(([category, contacts]) => ({
+      category,
+      contacts,
+    }));
+  }, [dbContacts]);
+
+  const socialLinks = useMemo(() => {
+    if (!dbSocials || dbSocials.length === 0) return fallbackSocialLinks;
+    return dbSocials.map((s) => ({
+      name: s.title,
+      url: s.url ?? "#",
+      icon: s.icon ?? "Globe",
+      color: s.iconColor ?? "text-primary",
+    }));
+  }, [dbSocials]);
+
+  const heroHighlights = useMemo(() => {
+    if (!dbHighlights || dbHighlights.length === 0)
+      return fallbackHeroHighlights;
+    return dbHighlights.map((h) => ({
+      label: h.title,
+      value: h.subtitle ?? h.description ?? "",
+    }));
+  }, [dbHighlights]);
+
   const api = useMutation(
     trpc.contact.send.mutationOptions({
       onMutate: () => {
@@ -139,7 +193,7 @@ export default function ContactPage() {
       onSuccess: async (_data, _vars, ctx) => {
         toast.success(
           "Message Sent. A representative from us will contact you soon.",
-          { id: ctx.toastId }
+          { id: ctx.toastId },
         );
         form.reset();
       },
@@ -149,7 +203,7 @@ export default function ContactPage() {
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
   const form = useForm<FormValues>({
     resolver: zodResolver(ContactSchema),
@@ -165,7 +219,7 @@ export default function ContactPage() {
     (values: FormValues) => {
       api.mutate(values);
     },
-    [api]
+    [api],
   );
   return (
     <div className="min-h-screen">
@@ -550,7 +604,10 @@ export default function ContactPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <social.icon className={`w-6 h-6 ${social.color}`} />
+                        <RenderIcon
+                          name={social.icon}
+                          className={`w-6 h-6 ${social.color}`}
+                        />
                         <span className="text-xs font-semibold uppercase tracking-wide">
                           {social.name}
                         </span>

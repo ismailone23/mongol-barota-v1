@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 export const APP_URL = "https://mongol-barota.mist.ac.bd";
+// export const APP_URL = "http://localhost:3000";
 export const tailwindColors = [
   { name: "Red", value: "red-500", hex: "#ef4444" },
   { name: "Orange", value: "orange-500", hex: "#f97316" },

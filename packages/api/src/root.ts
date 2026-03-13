@@ -1,4 +1,15 @@
-import { authRoute, competitionRoute, contactRoute, teamRoute } from "./routes";
+import {
+  authRoute,
+  competitionRoute,
+  contactRoute,
+  contentRoute,
+  galleryRoute,
+  joinRoute,
+  mediaRoute,
+  newsRoute,
+  researchRoute,
+  teamRoute,
+} from "./routes";
 import { createTRPCRouter, publicProcedure } from "./trpc";
 
 export const appRouter = createTRPCRouter({
@@ -9,6 +20,12 @@ export const appRouter = createTRPCRouter({
   competition: competitionRoute,
   team: teamRoute,
   contact: contactRoute,
+  content: contentRoute,
+  gallery: galleryRoute,
+  join: joinRoute,
+  media: mediaRoute,
+  news: newsRoute,
+  research: researchRoute,
 });
 
 // export type definition of API

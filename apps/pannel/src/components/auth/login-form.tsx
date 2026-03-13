@@ -45,13 +45,17 @@ export default function LoginForm() {
     setError("");
     setMessage("");
     startTransition(() => {
-      login(values, callbackUrl).then((data) => {
-        setError(data.error);
-        setMessage(data.message);
-        if (!data.error) {
-          form.reset();
-        }
-      });
+      login(values, callbackUrl)
+        .then((data) => {
+          setError(data.error);
+          setMessage(data.message);
+          if (!data.error) {
+            form.reset();
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     });
   };
   return (
@@ -109,8 +113,14 @@ export default function LoginForm() {
       </CardContent>
       <CardFooter className="flex-col gap-2">
         <Link
+          href="/auth/forgot-password"
+          className="text-sm text-muted-foreground hover:text-primary hover:underline"
+        >
+          Forgot your password?
+        </Link>
+        <Link
           href={"/auth/signup"}
-          className="hover:text-blue-500 hover:underline"
+          className="text-sm text-muted-foreground hover:text-primary hover:underline"
         >
           Don't have an account? Create User
         </Link>

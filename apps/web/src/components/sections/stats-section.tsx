@@ -80,7 +80,7 @@ function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
 
     if (cardRef.current) {
@@ -100,7 +100,7 @@ function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
           <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-4 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
             <stat.icon className="w-6 h-6 text-primary transition-all duration-300 group-hover:scale-110" />
           </div>
-          <div className="text-3xl font-bold text-primary mb-2 transition-all duration-300 group-hover:text-accent">
+          <div className="text-3xl font-bold text-secondart mb-2 transition-all duration-300 group-hover:text-primary">
             {count}
           </div>
           <div className="font-semibold mb-2 transition-colors duration-300 group-hover:text-foreground">

@@ -25,7 +25,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { SubTeamRecord } from "@workspace/types";
-import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 const leadership = [
   {
@@ -283,9 +283,16 @@ const subTeams = [
 
 export default function TeamPage() {
   const trpc = useTRPC();
-  const { data: teamDetails, isLoading } = useQuery(
-    trpc.team.getMembers.queryOptions()
-  );
+  const {
+    data: teamDetails,
+    isLoading,
+    isError,
+  } = useQuery(trpc.team.getMembers.queryOptions());
+
+  const leadershipMembers =
+    teamDetails?.filter((team) => team.subTeam === "LT") ?? [];
+  const facultyMembers =
+    teamDetails?.filter((team) => team.subTeam === "FA") ?? [];
 
   return (
     <div className="min-h-screen">
@@ -337,94 +344,107 @@ export default function TeamPage() {
 
           <div className="grid gap-8 max-w-5xl mx-auto">
             {isLoading ? (
-              <LoadingSpinner />
-            ) : !teamDetails || teamDetails.length < 1 ? (
-              <p>Something went wrong!</p>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-8">
+                  <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+                    <Skeleton className="w-full max-w-xs mx-auto lg:mx-0 aspect-square rounded-3xl" />
+                    <div className="flex-1 space-y-4">
+                      <Skeleton className="h-8 w-64" />
+                      <Skeleton className="h-6 w-40" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : isError ? (
+              <p className="text-center text-muted-foreground">
+                Failed to load team data.
+              </p>
+            ) : leadershipMembers.length < 1 ? (
+              <p className="text-center text-muted-foreground">
+                No leadership members found.
+              </p>
             ) : (
-              teamDetails
-                .filter((team) => team.subTeam == "LT")
-                .map((leader, index) => (
-                  <Card
-                    key={index}
-                    className="hover:shadow-lg transition-shadow"
-                  >
-                    <CardContent className="p-8">
-                      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-                        <div className="relative w-full max-w-xs mx-auto lg:mx-0 aspect-square overflow-hidden rounded-3xl">
-                          <Image
-                            src={leader.image || "/placeholder.svg"}
-                            alt={leader.name}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 1024px) 320px, 384px"
-                          />
+              leadershipMembers.map((leader, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-8">
+                    <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+                      <div className="relative w-full max-w-xs mx-auto lg:mx-0 aspect-square overflow-hidden rounded-3xl">
+                        <Image
+                          src={leader.image || "/placeholder.svg"}
+                          alt={leader.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 320px, 384px"
+                        />
+                      </div>
+                      <div className="flex-1 space-y-4 text-center lg:text-left">
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">
+                            {leader.name}
+                          </h3>
+                          <Badge variant="secondary" className="text-sm">
+                            {leader.role}
+                          </Badge>
                         </div>
-                        <div className="flex-1 space-y-4 text-center lg:text-left">
-                          <div>
-                            <h3 className="text-2xl font-bold mb-2">
-                              {leader.name}
-                            </h3>
-                            <Badge variant="secondary" className="text-sm">
-                              {leader.role}
-                            </Badge>
-                          </div>
-                          <div className="grid gap-1 text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground">
-                              {leader.department}
-                            </span>
-                            <span>{leader.bio}</span>
-                          </div>
-                          <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
-                            <Button
-                              asChild
-                              variant="outline"
-                              size="sm"
-                              className="rounded-full"
-                            >
-                              <Link href={`mailto:${leader.email}`}>
-                                <Mail className="w-4 h-4" />
-                                <span className="ml-2">Email</span>
-                              </Link>
-                            </Button>
-                            <Button
-                              asChild
-                              variant="outline"
-                              size="sm"
-                              className="rounded-full"
-                            >
-                              <Link href={`tel:${leader.phone}`}>
-                                <Phone className="w-4 h-4" />
-                                <span className="ml-2">Call</span>
-                              </Link>
-                            </Button>
-                            <Button
-                              asChild
-                              variant="outline"
-                              size="sm"
-                              className="rounded-full"
-                            >
-                              <Link href={leader.linkedin || "#"}>
-                                <Linkedin className="w-4 h-4" />
-                                <span className="ml-2">LinkedIn</span>
-                              </Link>
-                            </Button>
-                            <Button
-                              asChild
-                              variant="outline"
-                              size="sm"
-                              className="rounded-full"
-                            >
-                              <Link href={leader.github || "#"}>
-                                <Github className="w-4 h-4" />
-                                <span className="ml-2">GitHub</span>
-                              </Link>
-                            </Button>
-                          </div>
+                        <div className="grid gap-1 text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">
+                            {leader.department}
+                          </span>
+                          <span>{leader.bio}</span>
+                        </div>
+                        <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-2">
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            <Link href={`mailto:${leader.email}`}>
+                              <Mail className="w-4 h-4" />
+                              <span className="ml-2">Email</span>
+                            </Link>
+                          </Button>
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            <Link href={`tel:${leader.phone}`}>
+                              <Phone className="w-4 h-4" />
+                              <span className="ml-2">Call</span>
+                            </Link>
+                          </Button>
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            <Link href={leader.linkedin || "#"}>
+                              <Linkedin className="w-4 h-4" />
+                              <span className="ml-2">LinkedIn</span>
+                            </Link>
+                          </Button>
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full"
+                          >
+                            <Link href={leader.github || "#"}>
+                              <Github className="w-4 h-4" />
+                              <span className="ml-2">GitHub</span>
+                            </Link>
+                          </Button>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
             )}
           </div>
         </div>
@@ -445,75 +465,83 @@ export default function TeamPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {isLoading ? (
-              <LoadingSpinner />
-            ) : !teamDetails || teamDetails.length < 1 ? (
-              <p>Something went wrong!</p>
+              Array.from({ length: 4 }).map((_, idx) => (
+                <Card key={idx} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 space-y-4">
+                    <Skeleton className="mx-auto w-32 h-32 rounded-3xl" />
+                    <Skeleton className="h-5 w-2/3 mx-auto" />
+                    <Skeleton className="h-4 w-full" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : isError ? (
+              <p className="text-center text-muted-foreground">
+                Failed to load advisor data.
+              </p>
+            ) : facultyMembers.length < 1 ? (
+              <p className="text-center text-muted-foreground">
+                No faculty advisors found.
+              </p>
             ) : (
-              teamDetails
-                .filter((team) => team.subTeam == "FA")
-                .map((advisor, index) => (
-                  <Card
-                    key={index}
-                    className="hover:shadow-lg transition-shadow"
-                  >
-                    <CardContent className="p-6 space-y-4">
-                      <div className="relative mx-auto w-32 h-32 overflow-hidden rounded-3xl">
-                        <Image
-                          src={advisor.image || "/placeholder.svg"}
-                          alt={advisor.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="space-y-2 text-center">
-                        <h3 className="font-semibold text-base">
-                          {advisor.title} {advisor.name}
-                        </h3>
-
-                        <Badge
+              facultyMembers.map((advisor, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="relative mx-auto w-32 h-32 overflow-hidden rounded-3xl">
+                      <Image
+                        src={advisor.image || "/placeholder.svg"}
+                        alt={advisor.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="space-y-2 text-center">
+                      <h3 className="font-semibold text-base">
+                        {advisor.title} {advisor.name}
+                      </h3>
+                      <Badge
+                        variant="outline"
+                        className="text-xs px-3 py-1 rounded-full"
+                      >
+                        {advisor.role}
+                      </Badge>
+                      {advisor.about && (
+                        <div className="text-xs text-muted-foreground">
+                          {advisor.about}
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {advisor.bio}
+                      </p>
+                    </div>
+                    <div className="flex justify-center gap-3">
+                      {advisor.email && (
+                        <Button
+                          asChild
                           variant="outline"
-                          className="text-xs px-3 py-1 rounded-full"
+                          size="sm"
+                          className="rounded-full"
                         >
-                          {advisor.role}
-                        </Badge>
-                        {advisor.about && (
-                          <div className="text-xs text-muted-foreground">
-                            {advisor.about}
-                          </div>
-                        )}
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {advisor.bio}
-                        </p>
-                      </div>
-                      <div className="flex justify-center gap-3">
-                        {advisor.email && (
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full"
-                          >
-                            <Link href={`mailto:${advisor.email}`}>
-                              <Mail className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                        )}
-                        {advisor.phone && (
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full"
-                          >
-                            <Link href={`tel:${advisor.phone}`}>
-                              <Phone className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
+                          <Link href={`mailto:${advisor.email}`}>
+                            <Mail className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                      )}
+                      {advisor.phone && (
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full"
+                        >
+                          <Link href={`tel:${advisor.phone}`}>
+                            <Phone className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
             )}
           </div>
         </div>
@@ -601,13 +629,36 @@ export default function TeamPage() {
                   </h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {isLoading ? (
-                      <LoadingSpinner />
-                    ) : !teamDetails || teamDetails.length < 1 ? (
-                      <p>Something went wrong!</p>
+                      Array.from({ length: 3 }).map((_, idx) => (
+                        <Card
+                          key={idx}
+                          className="hover:shadow-lg transition-shadow"
+                        >
+                          <CardContent className="p-6 space-y-4">
+                            <Skeleton className="w-65 h-65 mx-auto rounded-3xl" />
+                            <Skeleton className="h-5 w-2/3 mx-auto" />
+                            <Skeleton className="h-4 w-1/2 mx-auto" />
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : isError ? (
+                      <p className="text-center text-muted-foreground">
+                        Failed to load team members.
+                      </p>
                     ) : (
-                      teamDetails
-                        .filter((td) => SubTeamRecord[td.subTeam] == team.name)
-                        .map((member, i) => (
+                      (() => {
+                        const members =
+                          teamDetails?.filter(
+                            (td) => SubTeamRecord[td.subTeam] === team.name,
+                          ) ?? [];
+                        if (members.length < 1) {
+                          return (
+                            <p className="text-center text-muted-foreground">
+                              No members found for this sub-team.
+                            </p>
+                          );
+                        }
+                        return members.map((member, i) => (
                           <Card
                             key={i}
                             className="hover:shadow-lg transition-shadow"
@@ -638,7 +689,8 @@ export default function TeamPage() {
                               </div>
                             </CardContent>
                           </Card>
-                        ))
+                        ));
+                      })()
                     )}
                   </div>
                 </div>

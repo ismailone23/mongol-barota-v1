@@ -2,6 +2,8 @@
 
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Target, Trophy, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,15 +11,17 @@ import { useEffect, useState } from "react";
 
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
+  const trpc = useTRPC();
+  const { data: sponsors } = useQuery(trpc.team.getSponsors.queryOptions());
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-br from-background via-background to-muted/20">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-black/[0.02] bg-[size:60px_60px]" />
+      <div className="absolute inset-0 bg-grid-black/[0.02] bg-size-[60px_60px]" />
 
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -50,7 +54,7 @@ export function HeroSection() {
                 }`}
               >
                 Pioneering
-                <span className="block animate-gradient bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] bg-clip-text text-transparent">
+                <span className="block animate-gradient bg-linear-to-r from-primary via-accent to-primary bg-size-[200%_100%] bg-clip-text text-transparent">
                   Mars Exploration
                 </span>
                 from Bangladesh
@@ -159,6 +163,43 @@ export function HeroSection() {
                 </div>
               ))}
             </div>
+
+            {sponsors && sponsors.length > 0 && (
+              <div
+                className={`space-y-4 pt-8 transition-all duration-1000 delay-[1450ms] ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                }`}
+              >
+                <div className="text-sm font-medium text-muted-foreground text-center lg:text-left">
+                  Trusted by our sponsors
+                </div>
+                <div className="overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="flex min-w-max items-center gap-4 pr-4">
+                    {sponsors.map((sponsor) => (
+                      <Link
+                        key={sponsor.id}
+                        href={sponsor.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-16 w-28 shrink-0 items-center justify-center rounded-xl border bg-card/70 px-3 py-2 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                      >
+                        <div className="relative h-10 w-full">
+                          <Image
+                            src={sponsor.logo || "/placeholder.svg"}
+                            alt={`${sponsor.name} logo`}
+                            fill
+                            sizes="112px"
+                            className="object-contain"
+                          />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Hero Image */}
@@ -171,7 +212,7 @@ export function HeroSection() {
           >
             <div className=" aspect-square max-w-lg">
               {/* Rover Image Placeholder */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl animate-pulse-slow" />
+              <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl animate-pulse-slow" />
               <Image
                 src="/rover_1.webp"
                 alt="Aurora X Mars Rover"

@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,10 +18,16 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen container mx-auto px-4 py-10 space-y-6">
+        <Skeleton className="h-10 w-56" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="rounded-xl border p-4 space-y-3">
+              <Skeleton className="h-36 w-full" />
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ))}
         </div>
       </div>
     );

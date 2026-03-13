@@ -19,7 +19,7 @@ export const teamRoute = createTRPCRouter({
       z.object({
         limit: z.number().min(1).max(100).default(10),
         cursor: z.number().nullish().default(0),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const limit = input.limit;
@@ -195,9 +195,6 @@ export const teamRoute = createTRPCRouter({
   getPlans: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.select().from(plans).orderBy(plans.displayOrder);
   }),
-  getAllSponsors: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.db.select().from(sponsors);
-  }),
   createSponsor: protectedProcedure
     .input(CreateSponsorSchema)
     .mutation(async ({ ctx, input }) => {
@@ -256,7 +253,7 @@ export const teamRoute = createTRPCRouter({
     return await ctx.db
       .select()
       .from(sponsors)
-      .orderBy(desc(sponsors.createdAt));
+      .orderBy(asc(sponsors.createdAt));
   }),
 
   getSponsor: publicProcedure
@@ -286,7 +283,7 @@ export const teamRoute = createTRPCRouter({
       })
       .from(sponsors)
       .innerJoin(plans, eq(sponsors.plan, plans.id))
-      .innerJoin(competitions, eq(sponsors.competitionId, competitions.id))
+      .leftJoin(competitions, eq(sponsors.competitionId, competitions.id))
       .orderBy(sponsors.createdAt);
 
     return sponsorsWithRelations;

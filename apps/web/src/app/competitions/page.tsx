@@ -6,7 +6,7 @@ import { RegionKey, RegionRecord } from "@workspace/types";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
-import { LoadingSpinner } from "@workspace/ui/components/loading-spinner";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -213,7 +213,7 @@ function CompetitionContent({
 }) {
   const trpc = useTRPC();
   const { data: history, isLoading } = useQuery(
-    trpc.competition.getCompetitionsByRegion.queryOptions({ region })
+    trpc.competition.getCompetitionsByRegion.queryOptions({ region }),
   );
   return (
     <div className="space-y-12">
@@ -308,7 +308,22 @@ function CompetitionContent({
         <div className="max-w-3xl mx-auto">
           <div className="space-y-4">
             {isLoading ? (
-              <LoadingSpinner />
+              Array.from({ length: 3 }).map((_, idx) => (
+                <Card key={idx} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-10 w-12" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-6 w-36" />
+                          <Skeleton className="h-4 w-52" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-6 w-24" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
             ) : !history || history.length < 1 ? (
               <div className="w-full flex items-center">
                 <p>no data to display</p>
@@ -435,7 +450,7 @@ export default function CompetitionsPage() {
                       region={selectedCompetition}
                     />
                   </div>
-                )
+                ),
             )}
           </div>
         </div>

@@ -67,7 +67,7 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
   const form = useForm<FormValues>({
@@ -97,7 +97,7 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
         setPreviewUrl(url);
       }
     },
-    []
+    [],
   );
 
   const onSubmit = useCallback(
@@ -128,7 +128,7 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
         console.log(error);
       }
     },
-    [createMember]
+    [createMember],
   );
 
   return (
@@ -194,7 +194,7 @@ export default function CreateMemberDialog({ refetch }: { refetch: any }) {
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rover Image</FormLabel>
+                    <FormLabel>Member Photo</FormLabel>
                     <FormControl>
                       <div className="space-y-4">
                         <div className="flex items-center gap-4">

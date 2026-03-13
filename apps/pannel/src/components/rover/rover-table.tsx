@@ -2,17 +2,11 @@
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RoversSelect } from "@workspace/db/schema";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import { Pencil, Trash2 } from "lucide-react";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import EditRoverDialog from "./edit-rover";
 
@@ -37,7 +31,7 @@ export default function RoverTable({
       onSuccess: (_data, _vars, ctx) => {
         toast.success("Rover Deleted", { id: ctx.toastId });
         void queryClient.invalidateQueries(
-          trpc.competition.getRovers.queryOptions()
+          trpc.competition.getRovers.queryOptions(),
         );
       },
       onError: (error, _vars, ctx) => {
@@ -46,7 +40,7 @@ export default function RoverTable({
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
   const deleteRoverCallback = useCallback(
@@ -55,122 +49,97 @@ export default function RoverTable({
         deleteRover.mutate({ id: rover.id });
       }
     },
-    [deleteRover]
+    [deleteRover],
   );
 
   return (
-    <div className="border border-gray-200 overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-20">Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Features</TableHead>
-            <TableHead>Achievements</TableHead>
-            <TableHead>Weight</TableHead>
-            <TableHead>Power</TableHead>
-            <TableHead>Dimensions</TableHead>
-            <TableHead>Arm</TableHead>
-            <TableHead>Autonomy</TableHead>
-            <TableHead>Active Period</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={8} className="text-center h-24">
-                Loading.....
-              </TableCell>
-            </TableRow>
-          ) : !rovers || rovers.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={8} className="text-center h-24">
-                No rovers found
-              </TableCell>
-            </TableRow>
-          ) : (
-            rovers.map((rover) => (
-              <TableRow key={rover.id}>
-                <TableCell>
-                  <img
-                    src={rover.image}
-                    alt={rover.name}
-                    className="w-10 h-10 rounded object-cover"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{rover.name}</TableCell>
-                <TableCell>{rover.status}</TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {rover.features && rover.features.length > 0 ? (
-                      rover.features.map((features, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
-                        >
-                          {features}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 text-xs">No feature</span>
-                    )}
+    <div className="rounded-md border p-4">
+      {isLoading ? (
+        <div className="h-24 flex items-center justify-center text-muted-foreground">
+          Loading...
+        </div>
+      ) : !rovers || rovers.length === 0 ? (
+        <div className="h-24 flex items-center justify-center text-muted-foreground">
+          No rovers found
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {rovers.map((rover) => (
+            <Card key={rover.id} className="overflow-hidden border-muted">
+              <img
+                src={rover.image}
+                alt={rover.name}
+                className="h-44 w-full object-cover"
+              />
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold">{rover.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(rover.year).getFullYear()}
+                      {rover.ended &&
+                        ` - ${new Date(rover.ended).getFullYear()}`}
+                    </p>
                   </div>
-                </TableCell>
-                <TableCell>
+                  <Badge variant="secondary">{rover.status}</Badge>
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">Features</p>
                   <div className="flex flex-wrap gap-1">
-                    {rover.achievements && rover.achievements.length > 0 ? (
-                      rover.achievements.map((achievements, index) => (
-                        <span
+                    {rover.features?.length ? (
+                      rover.features.slice(0, 3).map((feature, index) => (
+                        <Badge
                           key={index}
-                          className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
+                          variant="outline"
+                          className="text-xs"
                         >
-                          {achievements}
-                        </span>
+                          {feature}
+                        </Badge>
                       ))
                     ) : (
-                      <span className="text-gray-400 text-xs">
-                        No achievements
+                      <span className="text-xs text-muted-foreground">
+                        None
+                      </span>
+                    )}
+                    {rover.features && rover.features.length > 3 && (
+                      <span className="text-xs text-muted-foreground self-center">
+                        +{rover.features.length - 3}
                       </span>
                     )}
                   </div>
-                </TableCell>
-                <TableCell>{rover.spec.weight}</TableCell>
-                <TableCell>{rover.spec.power}</TableCell>
-                <TableCell>{rover.spec.dimensions}</TableCell>
-                <TableCell>{rover.spec.arm}</TableCell>
-                <TableCell>{rover.spec.autonomy}</TableCell>
-                <TableCell>
-                  <div className="text-sm flex ">
-                    <div>{new Date(rover.year).getFullYear()}</div>
-                    {rover.ended && (
-                      <div>-{new Date(rover.ended).getFullYear()}</div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1 items-center">
-                    <EditRoverDialog
-                      refetch={refetch}
-                      rover={rover}
-                      trigger={<Pencil className="w-4 h-4" />}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteRoverCallback(rover)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Specs</p>
+                  <p className="text-xs text-muted-foreground">
+                    {rover.spec.weight} · {rover.spec.power}
+                  </p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {rover.spec.dimensions}
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-1 items-center">
+                  <EditRoverDialog
+                    refetch={refetch}
+                    rover={rover}
+                    trigger={<Pencil className="w-4 h-4" />}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteRoverCallback(rover)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

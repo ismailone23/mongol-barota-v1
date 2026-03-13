@@ -10,30 +10,27 @@ export default function Competition() {
   const trpc = useTRPC();
 
   const { data, isLoading, isError, error, refetch } = useQuery(
-    trpc.competition.getCompetitions.queryOptions()
+    trpc.competition.getCompetitions.queryOptions(),
   );
 
   return (
-    <div>
-      <div className="bg-white rounded-lg ">
-        <div className="py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900">
-              All Competition Data
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Manage and view all Competitions ({data?.length} total)
-            </p>
-          </div>
-          <CreateCompetitionDialog refetch={refetch} />
+    <div className="space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Competitions
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Manage and view all competitions ({data?.length ?? 0} total)
+          </p>
         </div>
-
-        <CompetitionTable
-          refetch={refetch}
-          isLoading={isLoading}
-          competitions={data}
-        />
+        <CreateCompetitionDialog refetch={refetch} />
       </div>
+      <CompetitionTable
+        refetch={refetch}
+        isLoading={isLoading}
+        competitions={data}
+      />
     </div>
   );
 }

@@ -10,7 +10,6 @@ import { useQuery } from "@tanstack/react-query";
 export default function HomePage() {
   const trpc = useTRPC();
   const { data, isLoading } = useQuery(trpc.hello.queryOptions());
-  console.log({ data });
 
   return (
     <div className="flex flex-col min-h-screen">

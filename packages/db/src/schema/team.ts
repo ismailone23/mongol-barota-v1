@@ -1,4 +1,4 @@
-import { pgEnum, pgTable } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, primaryKey } from "drizzle-orm/pg-core";
 import { competitions } from "./competitions";
 import { relations } from "drizzle-orm";
 
@@ -59,12 +59,12 @@ export const competitionMembers = pgTable(
       .defaultNow()
       .notNull(),
   }),
-  (table) => ({
-    pk: {
+  (table) => [
+    primaryKey({
       name: "competitions_members_pk",
       columns: [table.teamMemberId, table.competitionId],
-    },
-  })
+    }),
+  ],
 );
 
 // Relations
@@ -83,5 +83,5 @@ export const competitionMembersRelations = relations(
       fields: [competitionMembers.competitionId],
       references: [competitions.id],
     }),
-  })
+  }),
 );

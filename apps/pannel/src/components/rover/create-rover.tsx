@@ -56,7 +56,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
           id: ctx?.toastId,
         });
       },
-    })
+    }),
   );
 
   const form = useForm<FormValues>({
@@ -91,7 +91,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
         setPreviewUrl(url);
       }
     },
-    []
+    [],
   );
 
   const onSubmit = useCallback(
@@ -122,7 +122,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
         console.log(error);
       }
     },
-    [createRover, selectedFile]
+    [createRover, selectedFile],
   );
 
   return (
@@ -318,7 +318,7 @@ export default function CreateRoverDialog({ refetch }: { refetch: any }) {
                         <FormControl>
                           <Input
                             className="w-full"
-                            placeholder="30cm adolf"
+                            placeholder="3-DOF"
                             {...field}
                           />
                         </FormControl>

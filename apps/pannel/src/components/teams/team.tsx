@@ -9,7 +9,7 @@ import CreateMemberDialog from "./create-member";
 
 export default function Team() {
   const trpc = useTRPC();
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
@@ -24,8 +24,8 @@ export default function Team() {
   } = useInfiniteQuery(
     trpc.team.getPaginatedMembers.infiniteQueryOptions(
       { limit: itemsPerPage },
-      { getNextPageParam: (lastPage) => lastPage.nextCursor }
-    )
+      { getNextPageParam: (lastPage) => lastPage.nextCursor },
+    ),
   );
 
   const members = data?.pages.flatMap((page) => page.currentMembers) ?? [];
@@ -58,34 +58,32 @@ export default function Team() {
     : Math.ceil(members.length / itemsPerPage);
 
   return (
-    <div>
-      <div className="bg-white rounded-lg ">
-        <div className="py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Team Members
-            </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Manage and view all team members ({members.length} total)
-            </p>
-          </div>
-          <CreateMemberDialog refetch={refetch} />
+    <div className="space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Team Members
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Manage and view all team members ({members.length} total)
+          </p>
         </div>
-
-        <TeamTable
-          refetch={refetch}
-          isLoading={isLoading}
-          paginatedMembers={paginatedMembers}
-        />
-
-        <Pagination
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          members={members}
-          hasNextPage={hasNextPage}
-          setCurrentPage={setCurrentPage}
-        />
+        <CreateMemberDialog refetch={refetch} />
       </div>
+
+      <TeamTable
+        refetch={refetch}
+        isLoading={isLoading}
+        paginatedMembers={paginatedMembers}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        members={members}
+        hasNextPage={hasNextPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 }

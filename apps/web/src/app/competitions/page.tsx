@@ -216,9 +216,9 @@ function CompetitionContent({
     trpc.competition.getCompetitionsByRegion.queryOptions({ region }),
   );
   return (
-    <div className="space-y-12">
+    <div className="space-y-10 sm:space-y-12">
       {/* Competition Overview */}
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
         <div className="space-y-6">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -246,7 +246,7 @@ function CompetitionContent({
             </div>
           </div>
 
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-full">
             <Link
               href={competition.website}
               target="_blank"
@@ -258,13 +258,13 @@ function CompetitionContent({
           </Button>
         </div>
 
-        <div className="relative">
+        <div className="relative mx-auto w-full max-w-xl">
           <Image
             src={competition.image || "/placeholder.svg"}
             alt={competition.name}
             width={500}
             height={300}
-            className="rounded-lg shadow-lg"
+            className="w-full rounded-2xl border border-border/70 shadow-[0_16px_50px_-24px_hsl(var(--foreground)/0.35)]"
           />
         </div>
       </div>
@@ -274,9 +274,12 @@ function CompetitionContent({
         <h3 className="text-2xl font-bold mb-8 text-center">
           Competition Missions
         </h3>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           {competition.missions.map((mission, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={index}
+              className="rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)]"
+            >
               <CardHeader>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -330,9 +333,12 @@ function CompetitionContent({
               </div>
             ) : (
               history.map((entry, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={index}
+                  className="rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)]"
+                >
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-4">
                         <div className="text-center">
                           <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
@@ -349,7 +355,9 @@ function CompetitionContent({
                           </div>
                         </div>
                       </div>
-                      <Badge variant="outline">{entry.highlights[0]}</Badge>
+                      <Badge variant="outline" className="w-fit">
+                        {entry.highlights[0]}
+                      </Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -370,17 +378,20 @@ export default function CompetitionsPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-linear-to-b from-background via-background to-muted/20">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24 bg-linear-to-b from-background via-background to-muted/20">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="outline" className="mb-6">
+            <Badge
+              variant="outline"
+              className="mb-6 rounded-full px-4 py-1 border-primary/20 bg-primary/5"
+            >
               Competitions
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-balance">
               Competing on the
               <span className="text-primary block">Global Stage</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 text-pretty">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
               From Utah's Mars Desert to Turkey's challenging terrain, we test
               our rovers against the world's best teams in prestigious
               international competitions.
@@ -400,8 +411,8 @@ export default function CompetitionsPage() {
       </section>
 
       {/* Competition Tabs/Dropdown */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
           {/* Mobile Dropdown */}
           <div className="md:hidden mb-8">
             <select
@@ -420,7 +431,7 @@ export default function CompetitionsPage() {
           {/* Desktop Tabs */}
           <div className="hidden md:block">
             <Tabs defaultValue="urc" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-12">
+              <TabsList className="grid w-full grid-cols-3 mb-10 sm:mb-12 h-auto p-1">
                 <TabsTrigger value="urc">
                   University Rover Challenge
                 </TabsTrigger>
@@ -457,9 +468,9 @@ export default function CompetitionsPage() {
       </section>
 
       {/* Competition Stats */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24 bg-muted/30">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Competition Statistics
             </h2>
@@ -468,8 +479,8 @@ export default function CompetitionsPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="text-center">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">
                   {data?.length}
@@ -479,7 +490,7 @@ export default function CompetitionsPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">
                   {data?.filter((i) => i.featured).length}
@@ -489,7 +500,7 @@ export default function CompetitionsPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">3</div>
                 <div className="text-sm text-muted-foreground">
@@ -497,7 +508,7 @@ export default function CompetitionsPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">
                   90.15%

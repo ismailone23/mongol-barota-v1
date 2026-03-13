@@ -155,13 +155,16 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-linear-to-br from-background via-background to-muted/20">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24 bg-linear-to-br from-background via-background to-muted/20">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="outline" className="mb-6">
+            <Badge
+              variant="outline"
+              className="mb-6 rounded-full px-4 py-1 border-primary/20 bg-primary/5"
+            >
               About Us
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-balance">
               Pioneering the Future of
               <span className="text-primary block">Space Exploration</span>
             </h1>
@@ -171,7 +174,7 @@ export default function AboutPage() {
                 <Skeleton className="h-6 w-5/6 max-w-2xl mx-auto" />
               </div>
             ) : (
-              <p className="text-xl text-muted-foreground mb-8 text-pretty">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
                 {heroText}
               </p>
             )}
@@ -195,36 +198,40 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Our Mission & Vision
               </h2>
-              <div className="space-y-6">
+              <div className="space-y-5 sm:space-y-6">
                 <div>
                   <h3 className="text-xl font-semibold mb-3 text-primary">
                     Mission
                   </h3>
-                  <p className="text-muted-foreground text-pretty">{mission}</p>
+                  <p className="text-muted-foreground leading-relaxed text-pretty">
+                    {mission}
+                  </p>
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold mb-3 text-primary">
                     Vision
                   </h3>
-                  <p className="text-muted-foreground text-pretty">{vision}</p>
+                  <p className="text-muted-foreground leading-relaxed text-pretty">
+                    {vision}
+                  </p>
                 </div>
               </div>
             </div>
             <div className="relative">
-              <div className="bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl p-8">
+              <div className="bg-linear-to-br from-primary/20 to-accent/20 rounded-3xl p-4 sm:p-6 lg:p-8">
                 <Image
                   src={contentMap?.mission?.image ?? "/about_pic.jpg"}
                   alt="Team working on rover"
                   width={400}
                   height={400}
-                  className="w-full h-auto object-cover rounded-lg"
+                  className="w-full h-auto object-cover rounded-2xl"
                 />
               </div>
             </div>
@@ -233,9 +240,9 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24 bg-muted/30">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Our Core Values
             </h2>
@@ -244,7 +251,7 @@ export default function AboutPage() {
               collaboration
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
             {isValuesLoading
               ? Array.from({ length: 4 }).map((_, idx) => (
                   <Card key={idx} className="text-center">
@@ -259,9 +266,9 @@ export default function AboutPage() {
               : values.map((value, index) => (
                   <Card
                     key={index}
-                    className="text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                    className="h-full text-center rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_-20px_hsl(var(--foreground)/0.5)]"
                   >
-                    <CardContent className="p-6">
+                    <CardContent className="p-6 sm:p-7">
                       <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-4">
                         <RenderIcon
                           name={value.icon}
@@ -271,7 +278,7 @@ export default function AboutPage() {
                       <h3 className="text-xl font-semibold mb-3">
                         {value.title}
                       </h3>
-                      <p className="text-muted-foreground text-sm">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         {value.description}
                       </p>
                     </CardContent>
@@ -282,9 +289,9 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Journey</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
               From humble beginnings to global recognition, here&apos;s how
@@ -292,7 +299,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="max-w-4xl mx-auto">
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {isTimelineLoading
                 ? Array.from({ length: 4 }).map((_, idx) => (
                     <div key={idx} className="flex gap-6">
@@ -310,12 +317,12 @@ export default function AboutPage() {
                 : timeline.map((item, index) => (
                     <div
                       key={`${item.year}-${item.title}-${index}`}
-                      className="flex gap-6 group"
+                      className="group flex gap-4 sm:gap-6"
                     >
                       <div className="flex flex-col items-center">
                         <div className="w-4 h-4 bg-primary rounded-full group-hover:scale-125 transition-transform" />
                         {index < timeline.length - 1 && (
-                          <div className="w-0.5 h-16 bg-border mt-4" />
+                          <div className="w-0.5 h-14 sm:h-16 bg-border mt-4" />
                         )}
                       </div>
                       <div className="flex-1 pb-8">
@@ -325,7 +332,7 @@ export default function AboutPage() {
                             {item.year}
                           </span>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">
+                        <h3 className="text-lg sm:text-xl font-semibold mb-2">
                           {item.title}
                         </h3>
                         <p className="text-muted-foreground">
@@ -340,8 +347,8 @@ export default function AboutPage() {
       </section>
 
       {/* MIST Connection */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24 bg-muted/30">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Military Institute of Science and Technology
@@ -349,7 +356,7 @@ export default function AboutPage() {
             <p className="text-lg text-muted-foreground mb-8 text-pretty">
               {institutionDesc}
             </p>
-            <div className="grid md:grid-cols-3 gap-6 mt-12">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-3 mt-10 sm:mt-12">
               {isStatsLoading
                 ? Array.from({ length: 3 }).map((_, idx) => (
                     <Card key={idx}>
@@ -360,7 +367,10 @@ export default function AboutPage() {
                     </Card>
                   ))
                 : stats.map((stat, index) => (
-                    <Card key={index}>
+                    <Card
+                      key={index}
+                      className="rounded-2xl border border-border/70 bg-card/80"
+                    >
                       <CardContent className="p-6 text-center">
                         <div className="text-2xl font-bold text-primary mb-2">
                           {stat.value}
@@ -377,12 +387,12 @@ export default function AboutPage() {
       </section>
 
       {/* Sponsor CTA */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-4xl mx-auto bg-linear-to-br from-primary/10 to-primary/5 border-2 border-primary/20">
-            <CardContent className="p-12 text-center">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
+          <Card className="max-w-4xl mx-auto rounded-3xl bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-[0_22px_60px_-35px_hsl(var(--foreground)/0.55)]">
+            <CardContent className="p-6 sm:p-10 lg:p-12 text-center">
               <h2 className="text-3xl font-bold mb-4">Support Our Mission</h2>
-              <p className="text-lg text-muted-foreground mb-8 text-pretty">
+              <p className="text-base sm:text-lg text-muted-foreground mb-8 text-pretty leading-relaxed">
                 {contentMap?.sponsor_cta?.body ??
                   "We're actively seeking sponsors for the 2026 season. Join us in representing Bangladesh on the global stage and inspiring the next generation of engineers. Your support will help us compete in URC & ARC 2026 and continue our legacy of excellence."}
               </p>

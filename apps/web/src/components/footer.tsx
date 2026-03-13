@@ -47,13 +47,13 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-secondary text-secondary-foreground">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-5 gap-8">
+    <footer className="border-t border-border/70 bg-secondary/95 text-secondary-foreground">
+      <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-5">
           {/* Brand Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6 lg:col-span-2">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="relative h-12 w-12 bg-white rounded-full p-3 overflow-hidden">
+              <div className="relative h-12 w-12 overflow-hidden rounded-full border border-border/60 bg-white p-2.5">
                 <Image
                   src="/footer_logo.webp"
                   alt="MIST Mongol Barota Logo"
@@ -63,8 +63,8 @@ export function Footer() {
                 />
               </div>
               <div>
-                <div className="text-xl font-bold">MIST</div>
-                <div className="text-lg font-semibold text-primary">
+                <div className="text-lg font-semibold tracking-wide">MIST</div>
+                <div className="text-sm font-bold tracking-[0.16em] text-primary">
                   MONGOL BAROTA
                 </div>
               </div>
@@ -87,14 +87,14 @@ export function Footer() {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               {socialLinks.map((social) => (
                 <Button
                   key={social.name}
                   asChild
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-primary/10"
+                  className="rounded-full border border-border/40 bg-background/40 hover:bg-primary/10"
                 >
                   <Link
                     href={social.href}
@@ -112,13 +112,13 @@ export function Footer() {
           {/* Links Sections */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title} className="space-y-4">
-              <h3 className="font-semibold text-lg">{title}</h3>
+              <h3 className="text-base font-semibold tracking-wide">{title}</h3>
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-secondary-foreground/80 hover:text-primary transition-colors text-sm"
+                      className="text-sm text-secondary-foreground/80 transition-colors hover:text-primary"
                     >
                       {link.name}
                     </Link>

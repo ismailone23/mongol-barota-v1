@@ -94,13 +94,13 @@ function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
     <ScrollAnimation delay={index * 100}>
       <Card
         ref={cardRef}
-        className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105 hover-lift group cursor-pointer"
+        className="group h-full cursor-pointer rounded-2xl border border-border/70 bg-card/80 text-center shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_-20px_hsl(var(--foreground)/0.5)]"
       >
-        <CardContent className="p-6">
+        <CardContent className="p-6 sm:p-7">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-4 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
             <stat.icon className="w-6 h-6 text-primary transition-all duration-300 group-hover:scale-110" />
           </div>
-          <div className="text-3xl font-bold text-secondart mb-2 transition-all duration-300 group-hover:text-primary">
+          <div className="mb-2 text-3xl font-bold text-primary transition-all duration-300 group-hover:text-accent">
             {count}
           </div>
           <div className="font-semibold mb-2 transition-colors duration-300 group-hover:text-foreground">
@@ -117,10 +117,10 @@ function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
 
 export function StatsSection() {
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section className="py-16 sm:py-20 lg:py-24 bg-linear-to-b from-muted/30 via-background to-muted/20">
+      <div className="container mx-auto max-w-7xl px-4">
         <ScrollAnimation>
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">
               Leading Mars Rover Innovation
             </h2>
@@ -131,7 +131,7 @@ export function StatsSection() {
           </div>
         </ScrollAnimation>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <StatCard key={index} stat={stat} index={index} />
           ))}

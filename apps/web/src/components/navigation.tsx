@@ -49,18 +49,18 @@ export function Navigation() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full border-b border-border/70 transition-all duration-300 ${
         isScrolled
-          ? "bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 shadow-lg"
-          : "bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
+          ? "bg-background/90 backdrop-blur-xl supports-backdrop-filter:bg-background/80 shadow-md"
+          : "bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60"
       }`}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto max-w-7xl px-4">
+        <div className="flex h-16 items-center justify-between lg:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div
-              className={`relative h-10 w-10 transition-transform duration-300 group-hover:scale-110 ${
+              className={`relative h-11 w-11 transition-transform duration-300 group-hover:scale-105 ${
                 mounted && resolvedTheme === "dark"
                   ? "rounded-full overflow-hidden bg-white"
                   : ""
@@ -78,17 +78,17 @@ export function Navigation() {
               />
             </div>
             <div className="hidden sm:block">
-              <div className="text-lg font-bold text-foreground transition-colors duration-300 group-hover:text-primary">
+              <div className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
                 MIST
               </div>
-              <div className="text-sm font-semibold text-primary">
+              <div className="text-xs font-bold text-primary/90">
                 MONGOL BAROTA
               </div>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden xl:flex items-center gap-1 rounded-full border border-border/70 bg-card/60 p-1 backdrop-blur-sm">
             {navigationItems.map((item, index) => {
               const isActive =
                 pathname === item.href ||
@@ -97,10 +97,10 @@ export function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 hover:scale-105 relative overflow-hidden group ${
+                  className={`relative overflow-hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-[1.02] group ${
                     isActive
-                      ? "text-primary-foreground bg-primary font-semibold"
-                      : "text-foreground hover:text-primary hover:bg-accent/50"
+                      ? "text-primary-foreground bg-primary font-semibold shadow-sm"
+                      : "text-foreground/80 hover:text-foreground hover:bg-accent/70"
                   }`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -118,14 +118,14 @@ export function Navigation() {
             <ThemeToggle />
             <Button
               asChild
-              className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:shadow-md"
             >
               <Link href="/support">Become a Sponsor</Link>
             </Button>
           </div>
 
           {/* Mobile Menu */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-2 xl:hidden">
             <div className="md:hidden">
               <ThemeToggle />
             </div>
@@ -140,7 +140,10 @@ export function Navigation() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80 overflow-y-auto">
+              <SheetContent
+                side="right"
+                className="w-[88vw] max-w-80 overflow-y-auto border-l border-border/70 bg-background/95 backdrop-blur-xl"
+              >
                 <div className="flex flex-col space-y-4 mt-8">
                   {navigationItems.map((item, index) => {
                     const isActive =
@@ -150,7 +153,7 @@ export function Navigation() {
                       <Link
                         key={item.name}
                         href={item.href}
-                        className={`text-lg font-medium transition-all duration-300 hover:translate-x-2 px-3 py-2 rounded-md ${
+                        className={`text-base font-medium transition-all duration-300 hover:translate-x-1 px-3 py-2.5 rounded-lg ${
                           isActive
                             ? "text-primary-foreground font-semibold bg-primary border-l-4 border-primary-foreground"
                             : "text-foreground hover:text-primary hover:bg-accent/50"
@@ -169,7 +172,7 @@ export function Navigation() {
                   <div className="pt-4 border-t">
                     <Button
                       asChild
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 hover:scale-105"
+                      className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
                     >
                       <Link href="/support" onClick={() => setIsOpen(false)}>
                         Become a Sponsor

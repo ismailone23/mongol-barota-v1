@@ -34,11 +34,14 @@ const achievements = [
 
 export function AchievementsPreview() {
   return (
-    <section className="py-20">
-      <div className="container mx-auto px-4">
+    <section className="py-16 sm:py-20 lg:py-24">
+      <div className="container mx-auto max-w-7xl px-4">
         <ScrollAnimation>
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <Badge
+              variant="outline"
+              className="mb-4 rounded-full px-4 py-1 border-primary/25 bg-primary/5"
+            >
               Our Journey
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">
@@ -52,11 +55,11 @@ export function AchievementsPreview() {
           </div>
         </ScrollAnimation>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="mb-12 grid gap-4 sm:gap-6 md:grid-cols-3">
           {achievements.map((achievement, index) => (
             <ScrollAnimation key={index} delay={index * 150}>
-              <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 group cursor-pointer hover-lift">
-                <CardContent className="p-6">
+              <Card className="group h-full cursor-pointer rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_-20px_hsl(var(--foreground)/0.5)]">
+                <CardContent className="p-6 sm:p-7">
                   <div
                     className={`inline-flex items-center justify-center w-12 h-12 ${achievement.bgColor} rounded-lg mb-4 transition-all duration-300 group-hover:scale-110`}
                   >
@@ -85,7 +88,7 @@ export function AchievementsPreview() {
               asChild
               variant="outline"
               size="lg"
-              className="transition-all duration-300 hover:scale-105 hover:bg-primary hover:text-primary-foreground group bg-transparent"
+              className="rounded-full transition-all duration-300 hover:scale-105 hover:bg-primary hover:text-primary-foreground group bg-transparent"
             >
               <Link href="/achievements">
                 View All Achievements

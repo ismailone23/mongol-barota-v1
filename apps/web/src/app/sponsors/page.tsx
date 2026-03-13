@@ -119,24 +119,27 @@ export default function SponsorsPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-linear-to-b from-background via-background to-muted/20">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24 bg-linear-to-b from-background via-background to-muted/20">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="outline" className="mb-6">
+            <Badge
+              variant="outline"
+              className="mb-6 rounded-full px-4 py-1 border-primary/20 bg-primary/5"
+            >
               <Heart className="w-4 h-4 mr-2" />
               Seeking Sponsors & Partners
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-balance">
               Partner with Us for
               <span className="text-primary block">URC & ARC 2026</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 text-pretty">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
               We're actively seeking sponsors to support our mission in the 2026
               season. Join us in pushing the boundaries of space exploration and
               representing Bangladesh with pride on the international stage.
             </p>
-            <div className="grid md:grid-cols-3 gap-6 mb-8 text-left">
-              <Card>
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-3 mb-8 text-left">
+              <Card className="rounded-2xl border border-border/70 bg-card/80">
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2">Target Audience</h4>
                   <p className="text-sm text-muted-foreground">
@@ -145,7 +148,7 @@ export default function SponsorsPage() {
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="rounded-2xl border border-border/70 bg-card/80">
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2">Competition Reach</h4>
                   <p className="text-sm text-muted-foreground">
@@ -153,7 +156,7 @@ export default function SponsorsPage() {
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="rounded-2xl border border-border/70 bg-card/80">
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2">Media Reach</h4>
                   <p className="text-sm text-muted-foreground">
@@ -190,9 +193,9 @@ export default function SponsorsPage() {
       <SponsorTiers isLoading={isLoading} sponsorshipTiers={sponsorshipTiers} />
 
       {/* Sponsorship Benefits */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24 bg-muted/30">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Why Partner With Us?
             </h2>
@@ -202,10 +205,13 @@ export default function SponsorsPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {sponsorshipBenefits.map((benefit, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
+              <Card
+                key={index}
+                className="rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_-20px_hsl(var(--foreground)/0.5)]"
+              >
+                <CardContent className="p-6 sm:p-7">
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <RenderIcon
                       name={benefit.icon}
@@ -213,7 +219,7 @@ export default function SponsorsPage() {
                     />
                   </div>
                   <h3 className="text-lg font-bold mb-3">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {benefit.description}
                   </p>
                 </CardContent>
@@ -224,8 +230,8 @@ export default function SponsorsPage() {
       </section>
 
       {/* Competition Timeline */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -236,8 +242,8 @@ export default function SponsorsPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-primary text-primary-foreground">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+              <Card className="rounded-2xl bg-primary text-primary-foreground">
                 <CardContent className="p-8 text-center">
                   <h3 className="text-2xl font-bold mb-2">SAR Submission</h3>
                   <p className="text-4xl font-bold mb-2">27 Feb 2026</p>
@@ -245,7 +251,7 @@ export default function SponsorsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-secondary">
+              <Card className="rounded-2xl bg-secondary border border-border/70">
                 <CardContent className="p-8 text-center">
                   <h3 className="text-2xl font-bold mb-2">URC Finals</h3>
                   <p className="text-4xl font-bold mb-2">27-30 May 2026</p>
@@ -258,10 +264,10 @@ export default function SponsorsPage() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-4xl mx-auto bg-primary text-primary-foreground">
-            <CardContent className="p-12 text-center">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
+          <Card className="max-w-4xl mx-auto rounded-3xl bg-primary text-primary-foreground shadow-[0_22px_60px_-35px_hsl(var(--foreground)/0.55)]">
+            <CardContent className="p-6 sm:p-10 lg:p-12 text-center">
               <h2 className="text-3xl font-bold mb-4">
                 Ready to Launch Your Partnership?
               </h2>

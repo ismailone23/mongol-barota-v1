@@ -297,17 +297,20 @@ export default function TeamPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-linear-to-br from-background via-background to-muted/20">
-        <div className="container mx-auto px-4">
+      <section className="py-6 sm:py-18 lg:py-24 bg-linear-to-br from-background via-background to-muted/20">
+        <div className="container mx-auto max-w-7xl px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge variant="outline" className="mb-6">
+            <Badge
+              variant="outline"
+              className="mb-6 rounded-full px-4 py-1 border-primary/20 bg-primary/5"
+            >
               Our Team
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-balance">
               The Minds Behind
               <span className="text-primary block">Mars Exploration</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 text-pretty">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
               Meet the passionate engineers, researchers, and innovators who
               make up MIST Mongol Barota. Our multidisciplinary team brings
               together expertise from across engineering fields to push the
@@ -330,9 +333,9 @@ export default function TeamPage() {
       </section>
 
       {/* Leadership Team */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Leadership Team
             </h2>
@@ -342,7 +345,7 @@ export default function TeamPage() {
             </p>
           </div>
 
-          <div className="grid gap-8 max-w-5xl mx-auto">
+          <div className="grid gap-6 sm:gap-8 max-w-5xl mx-auto">
             {isLoading ? (
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-8">
@@ -367,9 +370,12 @@ export default function TeamPage() {
               </p>
             ) : (
               leadershipMembers.map((leader, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={index}
+                  className="rounded-3xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)]"
+                >
                   <CardContent className="p-8">
-                    <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+                    <div className="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-start">
                       <div className="relative w-full max-w-xs mx-auto lg:mx-0 aspect-square overflow-hidden rounded-3xl">
                         <Image
                           src={leader.image || "/placeholder.svg"}
@@ -451,9 +457,9 @@ export default function TeamPage() {
       </section>
 
       {/* Faculty Advisors */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24 bg-muted/30">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Faculty Advisors
             </h2>
@@ -463,7 +469,7 @@ export default function TeamPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
             {isLoading ? (
               Array.from({ length: 4 }).map((_, idx) => (
                 <Card key={idx} className="hover:shadow-lg transition-shadow">
@@ -484,7 +490,10 @@ export default function TeamPage() {
               </p>
             ) : (
               facultyMembers.map((advisor, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={index}
+                  className="rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)]"
+                >
                   <CardContent className="p-6 space-y-4">
                     <div className="relative mx-auto w-32 h-32 overflow-hidden rounded-3xl">
                       <Image
@@ -548,9 +557,9 @@ export default function TeamPage() {
       </section>
 
       {/* Sub-teams */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Sub-teams</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
               Specialized teams working together to create world-class Mars
@@ -559,12 +568,12 @@ export default function TeamPage() {
           </div>
 
           <Tabs defaultValue="mechanical" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-12">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 h-auto gap-2 mb-10 sm:mb-12 p-1">
               {subTeams.map((team) => (
                 <TabsTrigger
                   key={team.id}
                   value={team.id}
-                  className="text-xs md:text-sm"
+                  className="text-[11px] sm:text-xs md:text-sm px-2 py-2.5 text-wrap"
                 >
                   {team.name}
                 </TabsTrigger>
@@ -587,8 +596,8 @@ export default function TeamPage() {
                   </p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8">
-                  <Card className="h-full">
+                <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+                  <Card className="h-full rounded-2xl border border-border/70 bg-card/80">
                     <CardContent className="p-6">
                       <h4 className="font-semibold mb-4 text-lg">
                         Key Responsibilities
@@ -607,7 +616,7 @@ export default function TeamPage() {
                     </CardContent>
                   </Card>
 
-                  <Card className="h-full">
+                  <Card className="h-full rounded-2xl border border-border/70 bg-card/80">
                     <CardContent className="p-6">
                       <h4 className="font-semibold mb-4 text-lg">
                         Required Skills
@@ -627,7 +636,7 @@ export default function TeamPage() {
                   <h4 className="font-semibold mb-6 text-center">
                     Team Members
                   </h4>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {isLoading ? (
                       Array.from({ length: 3 }).map((_, idx) => (
                         <Card
@@ -661,10 +670,10 @@ export default function TeamPage() {
                         return members.map((member, i) => (
                           <Card
                             key={i}
-                            className="hover:shadow-lg transition-shadow"
+                            className="rounded-2xl border border-border/70 bg-card/80 shadow-[0_12px_32px_-22px_hsl(var(--foreground)/0.45)]"
                           >
                             <CardContent className="p-6 space-y-4">
-                              <div className="relative w-65 h-65 mx-auto overflow-hidden rounded-3xl">
+                              <div className="relative mx-auto w-full max-w-xs aspect-square overflow-hidden rounded-3xl">
                                 <Image
                                   src={member.image || "/placeholder.svg"}
                                   alt={member.name}
@@ -701,9 +710,9 @@ export default function TeamPage() {
       </section>
 
       {/* Team Stats */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <section className="py-6 sm:py-18 lg:py-24 bg-muted/30">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Team Statistics
             </h2>
@@ -713,8 +722,8 @@ export default function TeamPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="text-center">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">40+</div>
                 <div className="text-sm text-muted-foreground">
@@ -722,13 +731,13 @@ export default function TeamPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">6</div>
                 <div className="text-sm text-muted-foreground">Sub-teams</div>
               </CardContent>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">8</div>
                 <div className="text-sm text-muted-foreground">
@@ -736,7 +745,7 @@ export default function TeamPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="text-center">
+            <Card className="text-center rounded-2xl border border-border/70 bg-card/80">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">12+</div>
                 <div className="text-sm text-muted-foreground">

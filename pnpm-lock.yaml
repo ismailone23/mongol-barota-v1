@@ -81,7 +81,7 @@ importers:
         specifier: ^0.475.0
         version: 0.475.0(react@19.2.0)
       next:
-        specifier: ^15.4.5
+        specifier: ^15.5.6
         version: 15.5.6(@babel/core@7.28.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next-auth:
         specifier: 5.0.0-beta.30
@@ -190,7 +190,7 @@ importers:
         specifier: ^0.475.0
         version: 0.475.0(react@19.2.0)
       next:
-        specifier: ^15.4.5
+        specifier: ^15.5.6
         version: 15.5.6(@babel/core@7.28.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next-themes:
         specifier: ^0.4.6
@@ -263,7 +263,7 @@ importers:
         specifier: ^0.44.7
         version: 0.44.7(@types/pg@8.15.6)(pg@8.16.3)(postgres@3.4.7)
       next:
-        specifier: ^15.4.5
+        specifier: ^15.5.6
         version: 15.5.6(@babel/core@7.28.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       nodemailer:
         specifier: ^7.0.10
@@ -416,7 +416,7 @@ importers:
   packages/eslint-config:
     devDependencies:
       '@next/eslint-plugin-next':
-        specifier: ^15.4.5
+        specifier: ^15.5.6
         version: 15.5.6
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.39.0
